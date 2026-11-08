@@ -1,18 +1,17 @@
-# Sustituid @nucleo, @datos, @frontend y @producto por el usuario de GitHub de cada uno (ver docs/ROLES.md).
-# Mientras sean marcadores, GitHub no asigna revisores.
-/contracts/                        @nucleo
-/backend/behaviorlab/scenarios/    @nucleo
-/backend/behaviorlab/game/         @nucleo
-/backend/behaviorlab/portfolio/    @nucleo @datos
-/backend/api/                      @nucleo
-/.github/                          @nucleo
-/Makefile                          @nucleo
-/pyproject.toml                    @nucleo
-/backend/behaviorlab/inference/    @datos
-/backend/behaviorlab/validation/   @datos
-/reports/                          @datos
-/frontend/                         @frontend
-/backend/behaviorlab/text/         @frontend
-/pitch/                            @producto
-/data/study/                       @producto
-/docs/SPEC.md                      @nucleo
+# Usuarios según docs/ROLES.md. Si cambia un rol, actualizad ambos archivos.
+/contracts/                        @villanuevadrian
+/backend/behaviorlab/scenarios/    @villanuevadrian
+/backend/behaviorlab/game/         @villanuevadrian
+/backend/behaviorlab/portfolio/    @villanuevadrian @amandehision16
+/backend/api/                      @villanuevadrian
+/.github/                          @villanuevadrian
+/Makefile                          @villanuevadrian
+/pyproject.toml                    @villanuevadrian
+/backend/behaviorlab/inference/    @amandehision16
+/backend/behaviorlab/validation/   @amandehision16
+/reports/                          @amandehision16
+/frontend/                         @pedribelp
+/backend/behaviorlab/text/         @pedribelp
+/pitch/                            @aal2k
+/data/study/                       @aal2k
+/docs/SPEC.md                      @villanuevadrian

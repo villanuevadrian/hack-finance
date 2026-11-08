@@ -27,7 +27,20 @@ docs/                   spec, roles, requisitos, decisiones, estado
 ```
 
 ## Instalación, configuración, ejecución y tests
-Se completa cuando exista el scaffold (`docs/BOOTSTRAP_PROMPT.md`). Comandos previstos: `make setup`, `make test`, `make lint`, `make run-api`, `make run-web`, `make validate`.
+Requisitos: **Python 3.12**, `make` y `git`. Todo se instala en `.venv/` dentro del repo (nada global).
+
+```bash
+git clone https://github.com/villanuevadrian/hack-finance.git
+cd hack-finance
+cp .env.example .env        # rellenad vuestra clave; .env nunca se sube
+make setup                  # crea .venv e instala dependencias
+make test                   # tests
+make lint                   # estilo (ruff)
+make run-api                # API en http://127.0.0.1:8000 (docs en /docs)
+```
+
+Si `python3.12` no está en el PATH: `make setup PYTHON=/ruta/a/python3.12`. En Windows, usad WSL.
+Pendientes: `make run-web` (tras D8) y `make validate` (lo implementa Datos).
 
 ## Equipo
 Ver `docs/ROLES.md`.

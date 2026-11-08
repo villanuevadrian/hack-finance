@@ -52,7 +52,8 @@ Orden: primero lo que bloquea los contratos (se congelan esta noche), después l
 ## 4. Preguntas que no puede resolver el equipo técnico
 | # | Duda | A quién | Decisión |
 |---|---|---|---|
-| P1 | Presupuesto de IA: ¿400 € en total y 50 € de tope en `.env.example` por persona o por fase? | Equipo | |
+| P1 | Presupuesto de IA: ¿400 € en total y 50 € de tope en `.env.example` por persona o por fase? | Equipo | **Resuelto (8-nov):** 100 € de API de Claude por persona. `LLM_BUDGET_EUR` es el tope de cada uno |
 | P2 | Acceso oficial a datos de MyInvestor y condiciones de uso del MCP | Organización | |
-| P3 | ¿Los 400 € se comparten con ElevenLabs? | Organización | |
+| P3 | ¿Los 400 € se comparten con ElevenLabs? | Organización | **Resuelto (8-nov):** no, ElevenLabs va aparte |
+| P5 | Canales del equipo | Equipo | **Resuelto (8-nov):** WhatsApp para avisos; doc y Drive compartidos aparte (fuera del repo: lo que se decida allí se copia a `DECISIONS.md`) |
 | P4 | Obligaciones normativas que citar (idoneidad, datos, gamificación), con fuente oficial | Industrial | |
