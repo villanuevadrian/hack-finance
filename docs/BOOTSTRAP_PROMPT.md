@@ -2,7 +2,7 @@
 
 Antes: crea el repo en GitHub, clónalo, copia dentro `CLAUDE.md` y `docs/SPEC.md`, y abre Claude Code en esa carpeta. Usa modo plan.
 
-> Nota (8-nov): el repo ya existe con la estructura de carpetas, los README por módulo, `.gitignore`, `.env.example`, `docs/STATUS.md` (una cabecera por rol) y `.github/`. Respétalos y complétalos; no los recrees. Lanzar solo cuando D1, D2, D6, D8 y las dudas C1-C5 y T1-T3 de `docs/DUDAS.md` estén cerradas.
+> Nota (8-nov): el repo ya existe con la estructura de carpetas, los README por módulo, `.gitignore`, `.env.example`, `docs/STATUS.md` (una cabecera por rol) y `.github/`. Respétalos y complétalos; no los recrees. Lanzar solo cuando D1, D2, D6, D8, D10, D11, D12 y las dudas C1-C5 y T1-T3 de `docs/DUDAS.md` estén cerradas.
 
 ---
 
@@ -11,7 +11,7 @@ Lee `CLAUDE.md` y `docs/SPEC.md`. Vamos a crear el esqueleto del proyecto Behavi
 Primero propón un plan breve (máximo 15 líneas) y espera mi OK. Después, cuando lo apruebe, crea SOLO el esqueleto, sin lógica de negocio:
 
 1. Estructura de carpetas exactamente como en `CLAUDE.md`, con `__init__.py` y un README corto por módulo.
-2. `contracts/` con los modelos pydantic `Scenario`, `GameState`, `Decision`, `Posterior`, `Profile`, `PortfolioProposal` según la sección 4 del SPEC. Solo campos y validaciones básicas; añade un test que valide un ejemplo de cada uno.
+2. `contracts/` con los modelos pydantic `Scenario`, `GameState`, `Decision`, `Posterior`, `Profile`, `PortfolioProposal` (y los que añadan las decisiones de `docs/DUDAS.md`: `Situation`, `CatalogPortfolio`, `Character`) según la sección 4 del SPEC. Solo campos y validaciones básicas; añade un test que valide un ejemplo de cada uno.
 3. `backend/behaviorlab/` con funciones vacías tipadas y docstrings que indiquen la fórmula prevista, que lancen `NotImplementedError`.
 4. `backend/api/` con FastAPI y los 4 endpoints del SPEC devolviendo datos de ejemplo válidos según los contratos.
 5. `Makefile` con `setup`, `test`, `lint`, `run-api`, `run-web`, `validate`.
