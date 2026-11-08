@@ -9,8 +9,9 @@ Esqueleto. Aún no hay código. Empieza por aquí:
 1. `docs/SPEC.md` — producto, MVP por tiers, plan hasta el miércoles.
 2. `docs/ROLES.md` — elegid rol y dueños.
 3. `docs/REQUIREMENTS.md` — requisitos con ID, prioridad y dueño.
-4. `docs/DECISIONS.md` — decisiones D1-D8 a cerrar hoy.
-5. `CLAUDE.md` — reglas que Claude Code carga automáticamente.
+4. `docs/DECISIONS.md` — decisiones D1-D9 a cerrar hoy (fuente de verdad de las decisiones).
+5. `docs/DUDAS.md` — hoja de dudas con recomendaciones para la reunión del domingo.
+6. `CLAUDE.md` — reglas que Claude Code carga automáticamente.
 
 ## Estructura
 ```
@@ -26,7 +27,7 @@ docs/                   spec, roles, requisitos, decisiones, estado
 ```
 
 ## Instalación, configuración, ejecución y tests
-Se completa cuando exista el scaffold (`docs/BOOTSTRAP_PROMPT.md`). Comandos previstos: `make setup`, `make test`, `make run-api`, `make run-web`, `make validate`.
+Se completa cuando exista el scaffold (`docs/BOOTSTRAP_PROMPT.md`). Comandos previstos: `make setup`, `make test`, `make lint`, `make run-api`, `make run-web`, `make validate`.
 
 ## Equipo
 Ver `docs/ROLES.md`.

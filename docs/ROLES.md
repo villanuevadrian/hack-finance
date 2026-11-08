@@ -4,9 +4,9 @@ Cada carpeta tiene un dueño: revisa sus PRs y decide en caso de duda. Rellenad 
 
 | Rol | Persona | GitHub | Dueño de | Responsable de |
 |---|---|---|---|---|
-| Producto, negocio y pitch (ing. industrial) | | | `pitch/`, `docs/SPEC.md` secciones 1-2, `data/study/` (protocolo) | Caso de negocio, diseño y calibración de escenarios, mini-prueba y consentimiento, normativa con fuentes oficiales, PDF y pitch |
+| Producto, negocio y pitch (ing. industrial) | | | `pitch/`, contenido de `docs/SPEC.md` secciones 1-2 (lo edita Núcleo, ver SPEC §8), `data/study/` (protocolo) | Caso de negocio, diseño y calibración de escenarios, mini-prueba y consentimiento, normativa con fuentes oficiales, PDF y pitch |
 | Modelo y validación (datos) | | | `backend/behaviorlab/inference/`, `validation/`, `reports/` | Modelo de elección, posterior, preguntas adaptativas, V1-V4, métricas del panel |
-| Núcleo y API (informática 1) | | | `contracts/`, `scenarios/`, `game/`, `portfolio/`, `backend/api/`, `.github/`, `Makefile` | Arquitectura, contratos, integración, CI, etiqueta y ZIP de entrega |
+| Núcleo y API (informática 1) | | | `contracts/`, `scenarios/`, `game/`, `portfolio/` (criterio y simulación con Datos), `backend/api/`, `.github/`, `Makefile`, `pyproject.toml` | Arquitectura, contratos, integración, CI, etiqueta y ZIP de entrega |
 | Frontend y experiencia (informática 2) | | | `frontend/`, `text/` | Juego, panel y visualizaciones, accesibilidad, textos con Claude, voz (Tier 2) |
 
 ## Reglas

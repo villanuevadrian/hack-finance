@@ -31,6 +31,8 @@ Hipótesis a defender, no hechos: (a) el juego aporta información que el test n
 **Fuera de alcance:** fiscalidad, acciones sueltas, derivados, asesoramiento regulado, detección de emociones por voz.
 
 ## 3. Decisiones por cerrar hoy
+Resumen. La fuente de verdad de las decisiones es `docs/DECISIONS.md`; las dudas abiertas, con recomendaciones, están en `docs/DUDAS.md`.
+
 | ID | Decisión | Propuesta | Estado |
 |---|---|---|---|
 | D1 | Variables a medir | λ (aversión a la pérdida), θ (caída a la que se vende), η (fracción del aumento de sueldo que se invierte) | decidir |
@@ -39,8 +41,9 @@ Hipótesis a defender, no hechos: (a) el juego aporta información que el test n
 | D4 | Escenarios | Sintéticos calibrados con volatilidad y caídas del catálogo; sin nombre | decidir |
 | D5 | Criterio de cartera | Maximizar el percentil 10 de riqueza final sujeto a P(venta en pánico) ≤ umbral | decidir |
 | D6 | Formato de salida al banco | `Profile` + `PortfolioProposal` (contratos) + regla cuando juego y test discrepan | decidir |
-| D7 | Umbrales de éxito de validación | ver sección 5 | decidir |
+| D7 | Umbrales de éxito de validación (criterios en la sección 5) | por definir con datos | decidir |
 | D8 | Stack frontend | React/Vite o Streamlit | decidir |
+| D9 | Nombre del producto | BehaviorLab (provisional) | decidir |
 
 ## 4. Arquitectura y contratos
 Módulos y flujo como en `CLAUDE.md`. Contratos mínimos (pydantic) que se congelan el domingo por la noche:

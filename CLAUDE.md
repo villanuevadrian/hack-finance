@@ -16,12 +16,12 @@ Fechas: entrega **miércoles 11-nov-2026 por la noche** (objetivo: enviar a las 
 6. **Validación matemática obligatoria.** Cada módulo numérico trae tests unitarios y, donde sea barato, una implementación de referencia independiente o tests de propiedades (Hypothesis).
 7. **Datos y legal.**
    - Prohibido en el repo: datos personales, secretos (`.env`), material con copyright (no subir el informe Morningstar X-Ray).
-   - El catálogo se guarda como snapshots en `data/catalog/` con fecha y fuente, generados a mano desde consultas conversacionales. **Nunca** con scripts ni bucles contra el MCP de MyInvestor (sus condiciones de uso no lo permiten).
+   - El catálogo se guarda como snapshots en `data/catalog/` con fecha y fuente, generados a mano desde consultas conversacionales. **Nunca** con scripts ni bucles contra el MCP de MyInvestor: mientras la organización no confirme otra cosa (pregunta abierta en `docs/SPEC.md` §11), asumimos que sus condiciones de uso no lo permiten.
    - Esto no es asesoramiento regulado: la UI y el README lo dicen.
 
 ## Arquitectura (resumen)
 ```
-contracts/            modelos pydantic compartidos (Scenario, Decision, Posterior, Profile, PortfolioProposal)
+contracts/            modelos pydantic compartidos (Scenario, GameState, Decision, Posterior, Profile, PortfolioProposal)
 backend/behaviorlab/
   scenarios/          generador de trayectorias sintéticas con semilla
   game/               estado del juego, acciones, ritmo de rondas
@@ -33,6 +33,9 @@ backend/api/          FastAPI, solo orquesta
 frontend/             juego + panel del banco (visualizaciones)
 data/catalog/         snapshots JSON del catálogo (fecha + fuente)
 data/study/           solo resultados agregados y anónimos
+data/cache/           textos generados cacheados
+reports/              salida de `make validate`
+pitch/                PDF, presentación, guion
 tests/  docs/
 ```
 Flujo: `scenarios → game → inference (posterior) → portfolio → Profile + PortfolioProposal → panel`.
