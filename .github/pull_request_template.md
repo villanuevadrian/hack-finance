@@ -1,4 +1,4 @@
-**Requisito(s):** RF-XX
+**Requisito(s):** RF-XX / RNF-XX
 **Qué cambia:**
 **Cómo lo he probado:** (`make test`, capturas…)
 

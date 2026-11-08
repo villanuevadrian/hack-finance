@@ -1,6 +1,7 @@
 # Decisiones
 
-Una entrada por decisión. Cerrad D1-D8 el domingo por la noche. Formato: contexto → opciones → decisión → consecuencia.
+Fuente de verdad de las decisiones (`docs/SPEC.md` §3 es solo un resumen). Una fila por decisión. Cerrad D1-D9 el domingo por la noche; las dudas y recomendaciones están en `docs/DUDAS.md`.
+Si una decisión necesita explicación, añadid debajo de la tabla una sección `### Dn` con: contexto → opciones → decisión → consecuencia.
 
 | ID | Pregunta | Propuesta inicial | Decisión final | Fecha | Quién |
 |---|---|---|---|---|---|
