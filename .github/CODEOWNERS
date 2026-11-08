@@ -1,0 +1,12 @@
+# Sustituid @usuario por el GitHub de cada uno (ver docs/ROLES.md)
+/contracts/                        @nucleo
+/backend/behaviorlab/scenarios/    @nucleo
+/backend/behaviorlab/game/         @nucleo
+/backend/behaviorlab/portfolio/    @nucleo
+/backend/api/                      @nucleo
+/backend/behaviorlab/inference/    @datos
+/backend/behaviorlab/validation/   @datos
+/frontend/                         @frontend
+/backend/behaviorlab/text/         @frontend
+/pitch/                            @producto
+/docs/SPEC.md                      @nucleo
