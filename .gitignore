@@ -9,3 +9,5 @@ dist/
 data/study/raw/
 reports/*.tmp
 .DS_Store
+*.egg-info/
+build/
