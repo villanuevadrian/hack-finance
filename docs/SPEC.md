@@ -44,6 +44,9 @@ Resumen. La fuente de verdad de las decisiones es `docs/DECISIONS.md`; las dudas
 | D7 | Umbrales de éxito de validación (criterios en la sección 5) | por definir con datos | decidir |
 | D8 | Stack frontend | React/Vite o Streamlit | decidir |
 | D9 | Nombre del producto | BehaviorLab (provisional) | decidir |
+| D10 | Bono de bienvenida en el juego | Marco narrativo + inversión del bono en la cartera propuesta | decidir |
+| D11 | Inicio "Crea tu personaje" | Cuestionario declarativo camuflado (baseline de V2 y RF-10) | decidir |
+| D12 | Nivel de videojuego | Estética de juego sin motor, junto a D8 | decidir |
 
 ## 4. Arquitectura y contratos
 Módulos y flujo como en `CLAUDE.md`. Contratos mínimos (pydantic) que se congelan el domingo por la noche:
