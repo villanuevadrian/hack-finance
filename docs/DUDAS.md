@@ -60,4 +60,4 @@ Orden: primero lo que bloquea los contratos (se congelan esta noche), después l
 | P3 | ¿Los 400 € se comparten con ElevenLabs? | Organización | **Resuelto (8-nov):** no, ElevenLabs va aparte |
 | P5 | Canales del equipo | Equipo | **Resuelto (8-nov):** WhatsApp para avisos; doc y Drive compartidos aparte (fuera del repo: lo que se decida allí se copia a `DECISIONS.md`) |
 | P4 | Obligaciones normativas que citar (idoneidad, datos, gamificación, y si un bono ligado al juego entra en normativa de juego o de promociones: D10), con fuente oficial | Industrial | |
-| P6 | Importe y condiciones reales del bono de bienvenida de MyInvestor (D10) | Industrial | |
+| P6 | Importe y condiciones reales del bono de bienvenida de MyInvestor (D10) | Industrial | **Resuelto (9-nov):** no hay bono general de bienvenida; existe el **Plan Amigo**: 25 € brutos para quien invita y para el invitado, si ambos tienen ≥ 100 € invertidos en fondos, carteras indexadas, acciones o planes (o 1.000 € en cuenta, o un depósito) en 3 meses (myinvestor.es/inversion/plan-amigo, consultado 9-nov-2026). En D10 hablar de "bono de 25 €" ligado al Plan Amigo o como propuesta para el banco |
