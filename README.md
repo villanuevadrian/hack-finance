@@ -42,5 +42,9 @@ make run-api                # API en http://127.0.0.1:8000 (docs en /docs)
 Si `python3.12` no está en el PATH: `make setup PYTHON=/ruta/a/python3.12`. En Windows, usad WSL.
 Pendientes: `make run-web` (tras D8) y `make validate` (lo implementa Datos).
 
+Endpoints de la API y flujo de una partida: [`backend/api/README.md`](backend/api/README.md). Con la API arrancada, la documentación interactiva está en http://127.0.0.1:8000/docs.
+
+> El modelo de inferencia actual es **provisional** (lo sustituye Datos): los perfiles llevan `provisional_model: true`.
+
 ## Equipo
 Ver `docs/ROLES.md`.
