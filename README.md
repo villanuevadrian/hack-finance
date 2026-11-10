@@ -39,6 +39,8 @@ make lint                   # estilo (ruff)
 make run-api                # API en http://127.0.0.1:8000 (docs en /docs)
 ```
 
+Las versiones exactas de las dependencias están fijadas en `requirements-lock.txt` (las probadas con `make test`), así la entrega instala igual en cualquier máquina. Para añadir o cambiar una dependencia: editarla en `pyproject.toml`, `make setup`, `make test` y `make lock`.
+
 Si `python3.12` no está en el PATH: `make setup PYTHON=/ruta/a/python3.12`. En Windows, usad WSL.
 Pendientes: `make run-web` (tras D8) y `make validate` (lo implementa Datos).
 
