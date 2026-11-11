@@ -36,10 +36,12 @@ cp .env.example .env        # rellenad vuestra clave; .env nunca se sube
 make setup                  # crea .venv e instala dependencias
 make test                   # tests
 make lint                   # estilo (ruff)
-make run-api                # API en http://127.0.0.1:8000 (docs en /docs)
+make run-api                # API en http://127.0.0.1:8000 (docs en /docs); carga .env si existe
 ```
 
 Las versiones exactas de las dependencias están fijadas en `requirements-lock.txt` (las probadas con `make test`), así la entrega instala igual en cualquier máquina. Para añadir o cambiar una dependencia: editarla en `pyproject.toml`, `make setup`, `make test` y `make lock`.
+
+**Claude es opcional.** Solo lo usa Vega, la ayudante, para explicar cómo funciona el juego. Sin clave (o si la llamada falla) responde con preguntas frecuentes fijas y la demo funciona entera sin red. Para activarlo, poned `ANTHROPIC_API_KEY` en `.env` (nunca se sube) y un límite de gasto en la consola de Anthropic; `http://127.0.0.1:8000/config` indica `"assistant_uses_claude": true` cuando está activo.
 
 Si `python3.12` no está en el PATH: `make setup PYTHON=/ruta/a/python3.12`. En Windows, usad WSL.
 Pendientes: `make run-web` (tras D8) y `make validate` (lo implementa Datos).

@@ -30,8 +30,9 @@ format: ## Arregla formato y lo que ruff pueda corregir solo
 	$(BIN)/ruff format .
 	$(BIN)/ruff check --fix .
 
-run-api: ## Arranca la API en http://127.0.0.1:8000 (docs en /docs)
-	$(BIN)/uvicorn api.main:app --reload
+run-api: ## Arranca la API en http://127.0.0.1:8000 (docs en /docs). Carga .env si existe
+	@if [ -f .env ]; then echo "Cargando variables de .env"; else echo "Sin .env: Vega responde con preguntas frecuentes"; fi
+	@set -a; if [ -f .env ]; then . ./.env; fi; set +a; exec $(BIN)/uvicorn api.main:app --reload
 
 run-web: ## Frontend: pendiente de D8 (React/Vite o Streamlit)
 	@echo "run-web pendiente: se define al cerrar D8 (ver docs/DUDAS.md)"; exit 1
