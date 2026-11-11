@@ -5,7 +5,7 @@ export interface Voice {
   on: boolean
   toggle: () => void
   /** Plays the ElevenLabs file of `key`; if there is no file, reads `text` with the browser's voice. */
-  play: (key: string, text?: string) => void
+  play: (key: string | undefined, text?: string) => void
   /** Like play, but only the first time this line appears in the session (no repetition when going back). */
   playOnce: (key: string, text?: string) => void
   /** Reads any text with the browser's voice (used for Vega's chat answers). */

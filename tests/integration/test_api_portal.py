@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 
 from api.main import app
 from api.main import store as live_store
-from api.store import GameStore
+from api.store import FileBackend, GameStore
 from tests.conftest import BASE_ANSWERS
 
 client = TestClient(app)
@@ -40,8 +40,8 @@ def test_store_survives_restart(tmp_path: Path) -> None:
     game_id = _play()
     record = live_store.get(game_id)
     assert record is not None
-    GameStore(data_dir=tmp_path).put(game_id, record)
-    reloaded = GameStore(data_dir=tmp_path).get(game_id)
+    GameStore(backend=FileBackend(tmp_path)).put(game_id, record)
+    reloaded = GameStore(backend=FileBackend(tmp_path)).get(game_id)
     assert reloaded is not None
     assert reloaded.state == record.state
     assert reloaded.answers == record.answers

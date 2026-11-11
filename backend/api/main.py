@@ -13,13 +13,18 @@ Flow for the frontend:
   GET  /games/{id}/counterfactuals    same market, other decisions (only once finished)
   GET  /config                        decision time limit and whether Vega's help uses Claude
   POST /assistant                     Vega's help: how the game works (never advice)
+  GET  /headlines                     market headlines by size of move (Claude cache or templates)
+  GET  /games/{id}/meta               time per decision (accessible mode) and review status
+  POST /games/{id}/review             the player asks for a human review (RGPD art. 22)
+  POST /tts                           text to speech with ElevenLabs (key only on the server)
 """
 
 import os
 import secrets
 import uuid
+from datetime import UTC, datetime
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -30,6 +35,12 @@ from behaviorlab.game.counterfactual import POLICIES, replay
 from behaviorlab.game.engine import DEFAULT_TIMEOUT_MS
 from behaviorlab.pipeline import evaluate_game
 from behaviorlab.text.assistant import answer as assistant_answer
+from behaviorlab.text.assistant import build_context
+from behaviorlab.text.headlines import load_bank
+from behaviorlab.text.tts import TTSUnavailableError, synthesize
+from behaviorlab.text.tts import available as tts_available
+from behaviorlab.text.tts import model_id as tts_model_id
+from behaviorlab.text.tts import voice_id as tts_voice_id
 from contracts import (
     Action,
     Catalog,
@@ -58,6 +69,21 @@ app.add_middleware(
 class NewGameRequest(BaseModel):
     answers: OnboardingAnswers
     seed: int | None = Field(default=None, ge=0, description="Omit for a random (returned) seed")
+    accessible: bool = Field(
+        default=False, description="Accessibility mode: double time per decision"
+    )
+    previous_game_id: str | None = Field(
+        default=None, description="Earlier game of the same player"
+    )
+
+
+class GameMeta(BaseModel):
+    """Per-game settings outside the contract: time per decision and review status."""
+
+    timeout_ms: int
+    accessible: bool
+    previous_game_id: str | None
+    review_requested_at: str | None
 
 
 class GameSummary(BaseModel):
@@ -77,6 +103,9 @@ class GameSummary(BaseModel):
     revealed_level: int | None = None
     reliability: str | None = None
     provisional_model: bool | None = None
+    accessible: bool = False
+    previous_game_id: str | None = None
+    review_requested_at: str | None = None
 
 
 class ReplayOut(BaseModel):
@@ -93,9 +122,20 @@ class Counterfactuals(BaseModel):
     alternatives: list[ReplayOut]
 
 
+class ChatTurn(BaseModel):
+    role: str = Field(pattern="^(user|assistant)$")
+    content: str = Field(max_length=2000)
+
+
 class AssistantRequest(BaseModel):
     question: str = Field(min_length=1, max_length=500)
     screen: str = Field(default="", max_length=40)
+    history: list[ChatTurn] = Field(default_factory=list, max_length=20)
+    game_id: str | None = None
+
+
+class TTSRequest(BaseModel):
+    text: str = Field(min_length=1, max_length=1500)
 
 
 class AssistantAnswer(BaseModel):
@@ -144,7 +184,19 @@ def create_game(req: NewGameRequest) -> GameState:
         scenario, state = new_game(game_id, req.answers, get_catalog(), seed)
     except (GameError, ValueError) as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
-    store.put(game_id, GameRecord(answers=req.answers, scenario=scenario, state=state))
+    if req.previous_game_id is not None:
+        _record(req.previous_game_id)  # 404 if it does not exist
+    timeout = DEFAULT_TIMEOUT_MS * 2 if req.accessible else None
+    store.put(
+        game_id,
+        GameRecord(
+            answers=req.answers,
+            scenario=scenario,
+            state=state,
+            timeout_ms=timeout,
+            previous_game_id=req.previous_game_id,
+        ),
+    )
     return state
 
 
@@ -158,7 +210,12 @@ def decide(game_id: str, req: DecisionRequest) -> GameState:
     record = _record(game_id)
     try:
         record.state = apply_decision(
-            record.state, record.scenario, req.action, req.response_time_ms, req.feeling_text
+            record.state,
+            record.scenario,
+            req.action,
+            req.response_time_ms,
+            req.feeling_text,
+            timeout_ms=record.timeout_ms or DEFAULT_TIMEOUT_MS,
         )
     except GameError as exc:
         status = 409 if record.state.finished else 422
@@ -203,6 +260,9 @@ def list_games() -> list[GameSummary]:
             n_rounds=record.state.n_rounds,
             goal=record.answers.goal.value,
             horizon=record.answers.horizon.value,
+            accessible=record.timeout_ms is not None,
+            previous_game_id=record.previous_game_id,
+            review_requested_at=record.review_requested_at,
         )
         if record.state.finished:
             _, profile, proposal = _results(game_id)
@@ -251,16 +311,79 @@ def counterfactuals(game_id: str) -> Counterfactuals:
 
 
 @app.get("/config")
-def config() -> dict[str, int | bool]:
+def config() -> dict[str, int | bool | str | None]:
     """What the frontend needs to know about this server."""
     return {
         "decision_timeout_ms": DEFAULT_TIMEOUT_MS,
         "assistant_uses_claude": bool(os.environ.get("ANTHROPIC_API_KEY")),
+        "tts_available": tts_available(),
+        # Not secret: lets the frontend check that the pre-recorded lines use the same voice.
+        "tts_voice_id": tts_voice_id() if tts_available() else None,
+        "tts_model": tts_model_id(),
+        # Where the games are kept: postgres, disk or memory (memory loses them on restart).
+        "storage": store.kind,
     }
+
+
+def _meta(record: GameRecord) -> GameMeta:
+    return GameMeta(
+        timeout_ms=record.timeout_ms or DEFAULT_TIMEOUT_MS,
+        accessible=record.timeout_ms is not None,
+        previous_game_id=record.previous_game_id,
+        review_requested_at=record.review_requested_at,
+    )
+
+
+@app.get("/games/{game_id}/meta")
+def game_meta(game_id: str) -> GameMeta:
+    return _meta(_record(game_id))
+
+
+@app.post("/games/{game_id}/review")
+def request_review(game_id: str) -> GameMeta:
+    """The player asks for a human review of the result (RGPD art. 22). Shown in the bank portal."""
+    record = _record(game_id)
+    if record.review_requested_at is None:
+        record.review_requested_at = datetime.now(UTC).isoformat(timespec="seconds")
+        store.put(game_id, record)
+    return _meta(record)
+
+
+MAX_ASSISTANT_CALLS_PER_GAME = 40
 
 
 @app.post("/assistant")
 def assistant(req: AssistantRequest) -> AssistantAnswer:
-    """Vega's help desk (backend/behaviorlab/text/assistant.py). Never investment advice."""
-    result = assistant_answer(req.question, req.screen)
+    """Vega's help desk (text/assistant.py). Never investment advice. With a finished game, the
+    server (not the browser) builds the minimal context of its results."""
+    context = ""
+    if req.game_id:
+        record = _record(req.game_id)
+        record.assistant_calls += 1
+        if record.assistant_calls > MAX_ASSISTANT_CALLS_PER_GAME:
+            raise HTTPException(
+                status_code=429, detail="Has hecho muchas preguntas en esta partida."
+            )
+        if record.state.finished:
+            _, profile, proposal = _results(req.game_id)
+            context = build_context(profile, proposal, record.answers)
+    history = [t.model_dump() for t in req.history]
+    result = assistant_answer(req.question, req.screen, history, context)
     return AssistantAnswer(answer=result.text, source=result.source)
+
+
+@app.post("/tts")
+def tts(req: TTSRequest) -> Response:
+    """Text to speech with ElevenLabs (key only on the server). 503 if unavailable."""
+    try:
+        audio = synthesize(req.text)
+    except TTSUnavailableError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    return Response(content=audio, media_type="audio/mpeg")
+
+
+@app.get("/headlines")
+def headlines() -> dict[str, object]:
+    """Headline bank: generated once with Claude (data/cache/headlines.json) or the templates."""
+    source, bank = load_bank()
+    return {"source": source, "headlines": bank}

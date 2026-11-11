@@ -4,7 +4,7 @@ import { Mentor } from '../components/Mentor'
 import { lessonFor } from '../learning'
 import { LEVELS } from '../levels'
 import { N } from '../voice/lines'
-import { SpeakButton } from '../voice/voice'
+import { ListenBar } from '../components/ListenBar'
 import type { World } from '../worlds'
 
 /** Before each level: Vega introduces the zone and a short lesson about products (never how to react). */
@@ -32,7 +32,8 @@ export function Briefing({ phase, world, onStart }: { phase: Phase; world: World
         </section>
       )}
       <section className="panel lesson">
-        <p className="lesson-tag">Lección <SpeakButton voiceKey={lesson.voiceKey} text={`${lesson.title}. ${lesson.points.join(' ')}`} label="Escuchar la lección" /></p>
+        <p className="lesson-tag">Lección</p>
+        <ListenBar text={`${lesson.title}. ${lesson.points.join(' ')}`} label="Escuchar la lección" compact />
         <h2>{lesson.title}</h2>
         <ol>{lesson.points.map((p) => <li key={p}>{p}</li>)}</ol>
       </section>

@@ -19,7 +19,8 @@
     "onboarding_quiz": "Tres retos rápidos. Si no sabes una respuesta, elige «No lo sé»: es mucho mejor que adivinar.",
     "onboarding_base": "Tu base: ingresos, ahorro y colchón. Si prefieres no responder algo, puedes, pero sin lo esencial no podré preparar tu plan.",
     "onboarding_mission": "Y tu misión: para qué es este dinero y cuándo lo necesitarás. De aquí sale tu mundo.",
-    "onboarding_summary": "Repasa tu ficha con calma. Si algo no es correcto, edítalo antes de empezar."
+    "onboarding_summary": "Repasa tu ficha con calma. Si algo no es correcto, edítalo antes de empezar.",
+    "results_low": "Antes de nada: tu perfil es poco concluyente, así que tu propuesta es prudente. Abajo te explico por qué y qué faltaría. Si quieres, puedes jugar otra partida para completarlo, o preguntarme lo que no entiendas."
   },
   "lessons": {
     "drop": {

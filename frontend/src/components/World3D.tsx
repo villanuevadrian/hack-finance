@@ -41,6 +41,11 @@ export function World3D({ run, world, avatar, reducedMotion }: Props) {
   const peakIdx = heights.indexOf(Math.max(...heights))
   const markAt = new Map(run.marks.map((m) => [m.round0, m.tone]))
   const wealth = run.path[run.path.length - 1]
+  // Everything the camera must keep in frame: the tallest column with the player or flag on top, and the
+  // storm clouds, which float just above it instead of at a fixed height (they used to be cut off).
+  const columnsTop = Math.max(...heights, 1) + topOffset(world.kind)
+  const storm = stormStrength(run.lastReturn)
+  const cloudY = columnsTop + 2.2
 
   return (
     <div className="world3d" role="img" aria-label={`${world.name}. Mes ${current + 1} de ${n}. Tu dinero: ${formatEur(wealth)}.`}>
@@ -49,7 +54,7 @@ export function World3D({ run, world, avatar, reducedMotion }: Props) {
         <fog attach="fog" args={[world.sky, 15, 38]} />
         <ambientLight intensity={0.9} color="#b9b0ff" />
         <directionalLight position={[-6, 10, 6]} intensity={2.2} color="#e6e0ff" castShadow shadow-mapSize={[1024, 1024]} />
-        <CameraRig width={n * SPACING} focusX={x(current)} topY={Math.max(...heights, 1) + topOffset(world.kind) + 1.3} reducedMotion={reducedMotion} />
+        <CameraRig width={n * SPACING} focusX={x(current)} topY={storm > 0.02 ? cloudY + 1.2 : columnsTop + 1.7} reducedMotion={reducedMotion} />
 
         <Island width={n * SPACING} world={world} />
 
@@ -77,7 +82,7 @@ export function World3D({ run, world, avatar, reducedMotion }: Props) {
 
         {heights.length > 0 && <Flag x={x(peakIdx) - 0.3} y={heights[peakIdx] + topOffset(world.kind)} />}
         <Player x={x(current)} y={(heights[current] ?? 0.3) + topOffset(world.kind)} accent={world.accent} avatar={avatar} reducedMotion={reducedMotion} />
-        <Storm strength={stormStrength(run.lastReturn)} x={x(current)} reducedMotion={reducedMotion} />
+        <Storm strength={storm} x={x(current)} y={cloudY} reducedMotion={reducedMotion} />
       </Canvas>
     </div>
   )
@@ -131,7 +136,7 @@ function CameraRig({ width, focusX, topY, reducedMotion }: { width: number; focu
     // Distance so the visible months fit both across (width) and up (from the island to the tallest column).
     const half = THREE.MathUtils.degToRad(cam.fov / 2)
     const dAcross = (visible / 2 + 0.6) / (Math.tan(half) * aspect)
-    const dUp = ((topY + 0.8) / 2 + 0.4) / Math.tan(half)
+    const dUp = ((topY + 0.8) / 2) * 1.12 / Math.tan(half)
     const d = Math.max(5, dAcross, dUp) * (narrow ? 1.12 : 1)
     const sway = reducedMotion ? 0 : Math.sin(clock.elapsedTime * 0.15) * 0.18
     const lookY = Math.max(1.2, (topY - 0.6) / 2)
@@ -300,7 +305,7 @@ function Player({ x, y, accent, avatar, reducedMotion }: { x: number; y: number;
  * Clouds over the player, as dense as this week's drop, and lightning when it is strong.
  * The same market move gives the same storm in every world.
  */
-function Storm({ strength, x, reducedMotion }: { strength: number; x: number; reducedMotion: boolean }) {
+function Storm({ strength, x, y, reducedMotion }: { strength: number; x: number; y: number; reducedMotion: boolean }) {
   const group = useRef<THREE.Group>(null)
   const bolt = useRef<THREE.Mesh>(null)
   const flash = useRef<THREE.PointLight>(null)
@@ -315,16 +320,16 @@ function Storm({ strength, x, reducedMotion }: { strength: number; x: number; re
   return (
     <group ref={group} position={[x, 0, 0]}>
       {clouds.map((cx, k) => (
-        <mesh key={k} position={[cx, 5.2 + (k % 2) * 0.3, -1.2 + (k % 3) * 0.35]}>
+        <mesh key={k} position={[cx, y + (k % 2) * 0.3, -1.2 + (k % 3) * 0.35]}>
           <sphereGeometry args={[0.7 + (k % 3) * 0.18, 16, 12]} />
           <meshStandardMaterial color="#5a5191" transparent opacity={0.35 + 0.6 * strength} roughness={1} />
         </mesh>
       ))}
-      <mesh ref={bolt} position={[0.4, 3.4, 0.2]} rotation={[0, 0, 0.25]} visible={false}>
+      <mesh ref={bolt} position={[0.4, y - 1.8, 0.2]} rotation={[0, 0, 0.25]} visible={false}>
         <boxGeometry args={[0.07, 2.9, 0.07]} />
         <meshStandardMaterial color="#ffffff" emissive="#e9e4ff" emissiveIntensity={4} />
       </mesh>
-      <pointLight ref={flash} position={[0, 6, 2]} intensity={0} distance={14} color="#d9d2ff" />
+      <pointLight ref={flash} position={[0, y + 0.8, 2]} intensity={0} distance={14} color="#d9d2ff" />
     </group>
   )
 }

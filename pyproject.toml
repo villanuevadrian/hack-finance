@@ -13,6 +13,7 @@ dependencies = [
     "pydantic>=2.7",
     "fastapi>=0.115",
     "uvicorn>=0.30",
+    "psycopg[binary]>=3.2",  # PostgreSQL store (DATABASE_URL); unused in memory and disk modes
 ]
 
 [project.optional-dependencies]

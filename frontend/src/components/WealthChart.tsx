@@ -3,17 +3,19 @@ import { formatEur } from '../format'
 
 interface Props {
   run: RunView
+  /** Wide and short drawing, for the "Tu mundo" panel of the game. */
+  wide?: boolean
 }
 
-const W = 800
-const H = 320
 const PAD = { top: 44, right: 24, bottom: 30, left: 24 }
 
 /**
  * The run as a ridge: wealth line with a glow, the drawdown from the running peak
  * as a striped "danger zone", a flag on the peak and the player marker on the last point.
  */
-export function WealthChart({ run }: Props) {
+export function WealthChart({ run, wide = false }: Props) {
+  const W = wide ? 1300 : 800
+  const H = wide ? 280 : 320
   const wealthPath = run.path
   const totalRounds = run.nRounds
   const lo = Math.min(...wealthPath)
@@ -42,6 +44,7 @@ export function WealthChart({ run }: Props) {
     <svg
       className="wealth-chart"
       viewBox={`0 0 ${W} ${H}`}
+      preserveAspectRatio="xMidYMid meet"
       role="img"
       aria-label={`Tu dinero: ahora ${formatEur(wealthPath[last])}, máximo ${formatEur(hi)}.`}
     >

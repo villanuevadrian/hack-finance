@@ -19,6 +19,9 @@ export interface GameSummary {
   revealed_level?: number | null
   reliability?: string | null
   provisional_model?: boolean | null
+  accessible?: boolean
+  previous_game_id?: string | null
+  review_requested_at?: string | null
 }
 
 /** GET /games/{id}/counterfactuals (backend/api/main.py, proposal for Núcleo): same market, other decisions. */
@@ -31,6 +34,13 @@ export interface Replay {
 export interface Counterfactuals {
   actual: Replay
   alternatives: Replay[]
+}
+
+export interface GameMeta {
+  timeout_ms: number
+  accessible: boolean
+  previous_game_id: string | null
+  review_requested_at: string | null
 }
 
 export class ApiError extends Error {
@@ -65,7 +75,17 @@ const post = <T,>(path: string, body: unknown) => request<T>(path, { method: 'PO
 
 export const api = {
   catalog: () => request<Catalog>('/catalog'),
-  createGame: (answers: OnboardingAnswers, seed?: number) => post<GameState>('/games', { answers, seed }),
+  createGame: (answers: OnboardingAnswers, opts: { accessible?: boolean; previousGameId?: string } = {}) =>
+    post<GameState>('/games', { answers, accessible: opts.accessible ?? false, previous_game_id: opts.previousGameId ?? null }),
+  /** Per-game settings (proposal for Núcleo): time per decision and human-review status. */
+  meta: (id: string) => request<GameMeta>(`/games/${id}/meta`),
+  requestReview: (id: string) => post<GameMeta>(`/games/${id}/review`, {}),
+  /** Text to speech with ElevenLabs on the server; rejects if unavailable (the caller uses the browser voice). */
+  tts: async (text: string): Promise<Blob> => {
+    const res = await fetch(`${BASE}/tts`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) })
+    if (!res.ok) throw new ApiError('TTS no disponible', res.status)
+    return res.blob()
+  },
   game: (id: string) => request<GameState>(`/games/${id}`),
   /** action null = no decision in time (counts as "do nothing" in the engine). */
   decide: (id: string, action: Action | null, responseTimeMs: number, feelingText?: string) =>
@@ -78,7 +98,16 @@ export const api = {
   listGames: () => request<GameSummary[]>('/games'),
   counterfactuals: (id: string) => request<Counterfactuals>(`/games/${id}/counterfactuals`),
   /** Server settings (proposal for Núcleo). 404 on servers without it: the frontend uses its defaults. */
-  config: () => request<{ decision_timeout_ms: number; assistant_uses_claude: boolean }>('/config'),
+  config: () => request<{
+    decision_timeout_ms: number
+    assistant_uses_claude: boolean
+    tts_available?: boolean
+    tts_voice_id?: string | null
+    tts_model?: string
+    storage?: 'postgres' | 'disk' | 'memory'
+  }>('/config'),
   /** Vega's help desk (proposal for Núcleo + text/). Only the question and the screen name are sent. */
-  ask: (question: string, screen: string) => post<{ answer: string; source: string }>('/assistant', { question, screen }),
+  headlines: () => request<{ source: string; headlines: Record<string, string[]> }>('/headlines'),
+  ask: (question: string, screen: string, history: { role: 'user' | 'assistant'; content: string }[] = [], gameId?: string) =>
+    post<{ answer: string; source: string }>('/assistant', { question, screen, history, game_id: gameId ?? null }),
 }

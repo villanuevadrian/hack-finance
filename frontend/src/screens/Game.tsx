@@ -11,7 +11,7 @@ import { hasWebGL, usePrefersReducedMotion } from '../hooks'
 import { LEVELS, roundsPerLevel } from '../levels'
 import { lifeEventFor, MISSION } from '../life'
 import type { World } from '../worlds'
-import { SpeakButton } from '../voice/voice'
+import { ListenBar } from '../components/ListenBar'
 
 const World3D = lazy(() => import('../components/World3D').then((m) => ({ default: m.World3D })))
 
@@ -20,6 +20,8 @@ interface Props {
   world: World
   avatar: Avatar
   goal: Goal
+  /** Read the month aloud automatically (accessibility preference). */
+  listen: boolean
   /** Time per decision, from the server (GET /config). */
   timeoutMs: number
   busy: boolean
@@ -42,7 +44,7 @@ const months = (eur: number, salary: number) => {
  * (a scene of everyday life plus the market news) and the options are played as action cards.
  * Every figure comes from the backend GameState.
  */
-export function Game({ game, world, avatar, goal, timeoutMs, busy, error, onDecide }: Props) {
+export function Game({ game, world, avatar, goal, listen, timeoutMs, busy, error, onDecide }: Props) {
   const reducedMotion = usePrefersReducedMotion()
   const [webgl] = useState(hasWebGL)
   const [view3d, setView3d] = useState(webgl)
@@ -71,13 +73,13 @@ export function Game({ game, world, avatar, goal, timeoutMs, busy, error, onDeci
       <dl className="hud-stats">
         <div><dt>Invertido</dt><dd>{formatEur(game.invested_eur)}</dd></div>
         <div><dt>En efectivo</dt><dd>{formatEur(game.cash_eur)}</dd></div>
-        <div><dt>Bajo tu máximo</dt><dd className={belowPeak >= 0.5 ? 'neg' : undefined}>{belowPeak >= 0.5 ? `−${formatEur(belowPeak)}` : 'En máximos'}</dd></div>
+        <div><dt>Por debajo de tu máximo</dt><dd className={belowPeak >= 0.5 ? 'neg' : undefined}>{belowPeak >= 0.5 ? `−${formatEur(belowPeak)}` : 'En máximos'}</dd></div>
         <div><dt>Sueldo</dt><dd>{formatEur(game.salary_eur)}{game.monthly_auto_invest_eur > 0 && ` (inviertes ${formatEur(game.monthly_auto_invest_eur)})`}</dd></div>
       </dl>
 
       <section className="step-block" aria-labelledby="step1">
         <h2 id="step1" className="step-label"><span>1</span> Qué ha pasado este mes</h2>
-        <EventCard game={game} />
+        <EventCard game={game} listen={listen} />
       </section>
 
       <section className="step-block" aria-labelledby="step2">
@@ -88,9 +90,9 @@ export function Game({ game, world, avatar, goal, timeoutMs, busy, error, onDeci
               <World3D run={run} world={world} avatar={avatar} reducedMotion={reducedMotion} />
             </Suspense>
           ) : (
-            <div className="stage-2d"><WealthChart run={run} /></div>
+            <div className="stage-2d"><WealthChart run={run} wide /></div>
           )}
-          <p className="stage-legend">Cada columna es tu dinero en un mes. La bandera marca tu máximo.</p>
+          <p className="stage-legend">{view3d ? 'Cada columna es tu dinero en un mes. La bandera marca tu máximo.' : 'La línea es tu dinero mes a mes. La bandera marca tu máximo.'}</p>
           <div className="hud-bottom">
             <div className="hud-chip hud-mission"><span aria-hidden="true">{mission.icon}</span> <span><span className="hud-k">Misión</span>{mission.text}</span></div>
             {webgl && (
@@ -107,25 +109,32 @@ export function Game({ game, world, avatar, goal, timeoutMs, busy, error, onDeci
   )
 }
 
-function EventCard({ game }: { game: GameState }) {
+function EventCard({ game, listen }: { game: GameState; listen: boolean }) {
   const life = lifeEventFor(game)
   const news = headlineFor(game)
   const move = lastMoveEur(game)
+  const spoken = [
+    `Mes ${game.round_index} de ${game.n_rounds}. ${life.title}. ${life.text}`,
+    `Noticias del mercado: ${news.text}.`,
+    move !== null && Math.abs(move) >= 0.5 ? `Tu inversión ha ${move < 0 ? 'bajado' : 'subido'} ${formatEur(Math.abs(move))} este mes.` : 'Tu inversión apenas se ha movido.',
+    game.kind === 'raise' ? `Te suben el sueldo ${formatEur(game.salary_raise_eur)} al mes.` : '',
+  ].join(' ')
   return (
     <div className="event-banner" aria-live="polite" key={game.round_index}>
       <div className="eb-cell eb-life">
         <span className="ec-month">Mes {game.round_index} de {game.n_rounds}</span>
+        <ListenBar key={game.round_index} text={spoken} label="Escuchar este mes" autoPlay={listen} compact />
         <div className="ec-life">
           <span className="ec-icon" aria-hidden="true">{life.icon}</span>
           <div>
-            <p className="ec-title">{life.title} <SpeakButton voiceKey={life.voiceKey} text={`${life.title}. ${life.text}`} /></p>
+            <p className="ec-title">{life.title}</p>
             <p className="ec-text">{life.text}</p>
           </div>
         </div>
       </div>
       <div className="eb-cell eb-news">
         <p className="ec-tag">Noticias del mercado</p>
-        <p className="ec-headline">{news.text} <SpeakButton voiceKey={news.voiceKey} text={news.text} /></p>
+        <p className="ec-headline">{news.text}</p>
         {game.kind === 'raise' && <p className="ec-raise">Subida de sueldo: <strong>+{formatEur(game.salary_raise_eur)} al mes</strong></p>}
       </div>
       <div className="eb-cell eb-money">
@@ -199,7 +208,7 @@ function DecisionPanel({ game, timeoutMs, busy, error, onDecide }: Pick<Props, '
   return (
     <section className="hand" aria-labelledby="decide-q">
       <div className="hand-head">
-        <h2 id="decide-q" className="step-label"><span>3</span> ¿Qué haces este mes?</h2>
+        <h2 id="decide-q" className="step-label"><span>3</span> {game.kind === 'raise' ? '¿Qué haces con tu subida de sueldo?' : game.cash_eur > 0 && game.invested_eur < 1 ? 'Tienes tu dinero en efectivo. ¿Qué haces este mes?' : '¿Qué haces con tu inversión este mes?'}</h2>
         <div className="fuse" role="timer" aria-label={`Quedan ${secs} segundos`} data-low={secs <= 5}>
           <span style={{ width: `${(left / timeoutMs) * 100}%` }} />
           <b>{secs} s</b>
@@ -222,9 +231,10 @@ function DecisionPanel({ game, timeoutMs, busy, error, onDecide }: Pick<Props, '
       <div className="hand-foot">
         {showFeeling ? (
           <label className="feeling">
-            <span className="muted small">¿Cómo te sientes? (opcional; no escribas datos personales)</span>
+            <span className="muted small">¿Cómo te sientes? Se envía junto con la carta que elijas (opcional; sin datos personales)</span>
             <input autoFocus type="text" maxLength={500} value={feeling} placeholder="Por ejemplo: nervioso, tranquilo…"
               onChange={(e) => { setFeeling(e.target.value); feelingRef.current = e.target.value }} />
+            {feeling.trim() && <span className="feeling-ok small">✓ Se enviará con tu decisión de este mes</span>}
           </label>
         ) : (
           <button className="ghost small" onClick={() => setShowFeeling(true)}>💬 Contar cómo te sientes</button>

@@ -1,5 +1,7 @@
 import { lazy, Suspense, useState } from 'react'
-import type { Counterfactuals } from '../api/client'
+import type { Counterfactuals, GameMeta } from '../api/client'
+import { ListenBar } from '../components/ListenBar'
+import { confidenceOf, type Confidence } from '../confidence'
 import { Revelation } from '../components/Revelation'
 import type { CandidateMetrics, Catalog, PortfolioProposal, Posterior, Profile } from '../api/types'
 import type { InvestorSheet } from '../character'
@@ -18,6 +20,8 @@ const AvatarPreview = lazy(() => import('../components/Avatar3D').then((m) => ({
 export interface Results {
   /** null when the backend has no counterfactuals endpoint yet: the section is hidden. */
   counterfactuals: Counterfactuals | null
+  /** Per-game settings (accessible mode, human review); null on servers without them. */
+  meta: GameMeta | null
   profile: Profile
   proposal: PortfolioProposal
   posterior: Posterior | null
@@ -28,25 +32,42 @@ interface Props {
   sheet: InvestorSheet
   world: World
   results: Results
+  gameId: string
+  meta: GameMeta | null
+  busy: boolean
   onPanel: () => void
   onRestart: () => void
+  onReplay: () => void
+  onReview: () => void
 }
 
 /** Final money of each scenario = amount x final multiple (both from the backend simulation). */
 const outcome = (c: CandidateMetrics, amount: number) => ({ p10: amount * c.final_multiple_p10, p50: amount * c.final_multiple_p50, p90: amount * c.final_multiple_p90 })
 const limitingText = (limiting: string[]) => limiting.map((l) => LIMIT_TEXT[l] ?? l).join(' y ')
 
-export function ResultsScreen({ sheet, world, results, onPanel, onRestart }: Props) {
+export function ResultsScreen({ sheet, world, results, gameId, meta, busy, onPanel, onRestart, onReplay, onReview }: Props) {
   const reducedMotion = usePrefersReducedMotion()
   const [showReport, setShowReport] = useState(false)
   const { profile, proposal, posterior } = results
   const chosen = proposal.candidates.find((c) => c.portfolio_id === proposal.portfolio_id)!
   const o = outcome(chosen, proposal.amount_eur)
   const alias = sheet.avatar.alias.trim()
+  const conf = confidenceOf(profile, 15)
+  const planText = [
+    `${conf.inconclusive ? 'Propuesta prudente' : 'Propuesta'} de ${ENTITY_NAME}: empezar con la ${proposal.portfolio_name}, nivel de riesgo ${proposal.risk_level} de 5.`,
+    `Tu nivel máximo es ${proposal.levels.final}, limitado por ${limitingText(proposal.levels.limiting)}.`,
+    proposal.justification,
+    `Con ${formatEur(proposal.amount_eur)} durante ${proposal.horizon_years} años, el escenario malo deja ${formatEur(o.p10)}, el central ${formatEur(o.p50)} y el bueno ${formatEur(o.p90)}.`,
+    conf.inconclusive ? `Es una propuesta prudente porque tu perfil es poco concluyente. ${conf.reasons.join(' ')}` : '',
+  ].join(' ')
 
   return (
     <main className="results">
-      <Mentor screen="plan" text={N.mentor.results} voiceKey="mentor_results" />
+      {conf.inconclusive ? (
+        <Mentor screen="plan" gameId={gameId} text={N.mentor.results_low} voiceKey="mentor_results_low" />
+      ) : (
+        <Mentor screen="plan" gameId={gameId} text={N.mentor.results} voiceKey="mentor_results" />
+      )}
       <div className="profile-head no-print">
         <div className="panel profile-portrait">
           <Suspense fallback={<div className="avatar-preview" />}>
@@ -61,7 +82,8 @@ export function ResultsScreen({ sheet, world, results, onPanel, onRestart }: Pro
 
       <div className="no-print results-body">
         <section className="panel plan">
-          <p className="plan-tag">Propuesta de {ENTITY_NAME}</p>
+          <p className="plan-tag">{conf.inconclusive ? `Propuesta prudente de ${ENTITY_NAME}: perfil poco concluyente` : `Propuesta de ${ENTITY_NAME}`}</p>
+          <ListenBar text={planText} label="Escuchar tu plan" />
           <h2>Te proponemos empezar con la <span className="gold">{proposal.portfolio_name}</span></h2>
           <p className="plan-risk">Nivel de riesgo {proposal.risk_level} de 5. Tu nivel máximo es {proposal.levels.final}, limitado por {limitingText(proposal.levels.limiting)}.</p>
           <p>{proposal.justification}</p>
@@ -78,6 +100,7 @@ export function ResultsScreen({ sheet, world, results, onPanel, onRestart }: Pro
           <p className="notice">{proposal.disclaimer}</p>
         </section>
 
+        <ConfidenceCard conf={conf} meta={meta} busy={busy} onReplay={onReplay} />
         {results.counterfactuals ? (
           <Revelation data={results.counterfactuals} />
         ) : (
@@ -91,6 +114,17 @@ export function ResultsScreen({ sheet, world, results, onPanel, onRestart }: Pro
         <PortfolioMap proposal={proposal} />
         <Observed profile={profile} posterior={posterior} />
 
+        <section className="panel review-card">
+          <h2>¿Quieres que una persona revise tu resultado?</h2>
+          <p className="muted">Tienes derecho a que una persona de la entidad revise un resultado elaborado de forma automática (RGPD, art. 22).</p>
+          {meta?.review_requested_at ? (
+            <p className="review-ok" role="status">✓ Solicitud registrada el {new Date(meta.review_requested_at).toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' })}. La entidad la verá en su portal.</p>
+          ) : (
+            <button className="ghost" onClick={onReview} disabled={busy || !meta}>Pedir revisión humana</button>
+          )}
+          {!meta && <p className="muted small">Disponible cuando el servidor tenga la última actualización.</p>}
+        </section>
+
         <div className="creation-nav">
           <button className="start" onClick={() => setShowReport((v) => !v)}>{showReport ? 'Ocultar el informe' : 'Ver el informe de idoneidad'}</button>
           <button className="ghost" onClick={onPanel}>Ver el panel del banco</button>
@@ -100,6 +134,40 @@ export function ResultsScreen({ sheet, world, results, onPanel, onRestart }: Pro
 
       {showReport && <Report sheet={sheet} world={world} results={results} />}
     </main>
+  )
+}
+
+function ConfidenceCard({ conf, meta, busy, onReplay }: { conf: Confidence; meta: GameMeta | null; busy: boolean; onReplay: () => void }) {
+  const text = [`Confianza de tu perfil: ${conf.title}.`, ...conf.reasons, conf.missing.length ? `Para una propuesta más precisa: ${conf.missing.join(' ')}` : ''].join(' ')
+  return (
+    <section className="panel confidence" data-level={conf.level} aria-labelledby="conf-h">
+      <div className="conf-head">
+        <h2 id="conf-h">Confianza de tu perfil</h2>
+        <ListenBar text={text} label="Escuchar la confianza" compact />
+      </div>
+      <p className="conf-level"><span className="conf-dot" aria-hidden="true" /> {conf.title}</p>
+      {conf.reasons.length > 0 && (
+        <>
+          <h3>Por qué</h3>
+          <ul>{conf.reasons.map((r) => <li key={r}>{r}</li>)}</ul>
+        </>
+      )}
+      {conf.inconclusive && (
+        <p>Por eso la propuesta es <strong>prudente</strong>: con poca información, se elige la opción que menos probabilidades tiene de que la abandones en una caída. No es una conclusión definitiva sobre ti.</p>
+      )}
+      {conf.missing.length > 0 && (
+        <>
+          <h3>Qué haría falta para afinarla</h3>
+          <ul>{conf.missing.map((m) => <li key={m}>{m}</li>)}</ul>
+        </>
+      )}
+      {conf.level !== 'alta' && (
+        <div className="conf-cta">
+          <button className="start" onClick={onReplay} disabled={busy}>Jugar otra partida para completar mi perfil</button>
+          <p className="muted small">Mantienes tu ficha; juegas un mercado nuevo. Las dos partidas quedan registradas y la entidad las ve.{meta?.accessible ? ' Seguirás con el doble de tiempo.' : ''}</p>
+        </div>
+      )}
+    </section>
   )
 }
 

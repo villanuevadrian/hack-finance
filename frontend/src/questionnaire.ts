@@ -80,7 +80,7 @@ export const QUESTIONS: Question[] = [
     { value: 'unemployed', label: 'Ahora no tengo actividad' },
     { value: 'retired', label: 'Estoy jubilado o jubilada' },
   ] },
-  { id: 'known_products', code: 'K3', kind: 'multi', label: '¿Qué productos conoces bien?', help: 'Puedes elegir varios.', options: PRODUCTS, noneLabel: 'Ninguno' },
+  { id: 'known_products', code: 'K3', kind: 'multi', label: '¿Qué productos sabrías explicar a otra persona?', help: 'Marca los que entiendes bien: cómo funcionan y qué riesgos tienen. Puedes elegir varios.', options: PRODUCTS, noneLabel: 'Ninguno' },
   { id: 'invested_products', code: 'K4', kind: 'multi', label: '¿En cuáles has invertido en los últimos 3 años?', help: 'Puedes elegir varios.', options: PRODUCTS, noneLabel: 'Ninguno' },
   { id: 'trading_frequency', code: 'K5', kind: 'single', label: '¿Con qué frecuencia inviertes o mueves tus inversiones?', options: [
     { value: 'never', label: 'Nunca' },
@@ -88,7 +88,7 @@ export const QUESTIONS: Question[] = [
     { value: 'several_per_year', label: 'Varias veces al año' },
     { value: 'monthly', label: 'Cada mes o más' },
   ] },
-  { id: 'invested_volume', code: 'K6', kind: 'single', label: '¿Cuánto has invertido, más o menos, en esos 3 años?', options: [
+  { id: 'invested_volume', code: 'K6', kind: 'single', label: 'En total, ¿cuánto dinero has invertido en esos 3 años, más o menos?', options: [
     { value: 'none', label: 'Nada' },
     { value: 'lt_3k', label: 'Menos de 3.000 €' },
     { value: '3k_15k', label: 'Entre 3.000 y 15.000 €' },
@@ -158,7 +158,7 @@ export const QUESTIONS: Question[] = [
     { value: '3_6', label: 'De 3 a 6 meses' },
     { value: 'gt_6', label: 'Más de 6 meses' },
   ] },
-  { id: 'share_invested', code: 'S7', kind: 'single', label: '¿Qué parte de lo que tienes vas a invertir aquí?', skipLabel: NO_ANSWER, options: [
+  { id: 'share_invested', code: 'S7', kind: 'single', label: 'De todos tus ahorros, ¿qué parte vas a invertir aquí?', skipLabel: NO_ANSWER, options: [
     { value: 'lt_25', label: 'Menos de una cuarta parte' },
     { value: '25_50', label: 'Entre una cuarta parte y la mitad' },
     { value: '50_75', label: 'Entre la mitad y tres cuartas partes' },
@@ -179,7 +179,7 @@ export const QUESTIONS: Question[] = [
     { value: '6_7', label: 'De 6 a 7 años' },
     { value: 'gt_7', label: 'Dentro de más de 7 años' },
   ] },
-  { id: 'return_preference', code: 'O3', kind: 'return', label: '¿Qué año malo y qué año bueno aceptarías?', help: 'Elige tu montaña rusa. Las cantidades se calculan sobre lo que vas a invertir.', options: [
+  { id: 'return_preference', code: 'O3', kind: 'return', label: '¿Con qué montaña rusa estarías cómodo?', help: 'Cada vagoneta une un año malo y un año bueno: no se puede tener uno sin el otro. Las cantidades se calculan sobre lo que vas a invertir.', options: [
     { value: 'minus2_plus2', bad: -0.02, good: 0.02 },
     { value: 'minus8_plus4', bad: -0.08, good: 0.04 },
     { value: 'minus15_plus6', bad: -0.15, good: 0.06 },

@@ -37,18 +37,18 @@ export function actionView(a: Action, s: GameState): { name: string; desc: strin
   switch (a) {
     case 'sell_all': return { name: 'Vender todo', desc: 'Pasas tu inversión a efectivo', tone: 'out' }
     case 'hold': return { name: 'Mantener', desc: 'No tocas nada', tone: 'stay' }
-    case 'contribute': return { name: `Aportar ${formatEur(contribution)}`, desc: 'El 10 % de tu sueldo de este mes', tone: 'in' }
-    case 'stay_out': return { name: 'Seguir fuera', desc: 'Mantienes tu dinero en efectivo', tone: 'stay' }
-    case 'buy_back': return { name: 'Volver a invertir', desc: 'Inviertes todo tu efectivo', tone: 'in' }
-    case 'invest_raise_0': return { name: 'No invertir la subida', desc: `Te quedas los ${formatEur(raise)} al mes`, tone: 'stay' }
-    case 'invest_raise_50': return { name: `Invertir ${formatEur(raise / 2)} al mes`, desc: 'La mitad de tu subida', tone: 'in' }
-    case 'invest_raise_100': return { name: `Invertir ${formatEur(raise)} al mes`, desc: 'Toda tu subida', tone: 'in' }
+    case 'contribute': return { name: `Aportar ${formatEur(contribution)}`, desc: 'Inviertes más este mes: el 10 % de tu sueldo', tone: 'in' }
+    case 'stay_out': return { name: 'Seguir en efectivo', desc: 'No vuelves a invertir este mes', tone: 'stay' }
+    case 'buy_back': return { name: 'Volver a invertir', desc: 'Todo tu efectivo vuelve a la inversión', tone: 'in' }
+    case 'invest_raise_0': return { name: 'No invertir la subida', desc: `Te quedas los ${formatEur(raise)} extra cada mes`, tone: 'stay' }
+    case 'invest_raise_50': return { name: `Invertir ${formatEur(raise / 2)} al mes`, desc: 'La mitad de tu subida, cada mes a partir de ahora', tone: 'in' }
+    case 'invest_raise_100': return { name: `Invertir ${formatEur(raise)} al mes`, desc: 'Toda tu subida, cada mes a partir de ahora', tone: 'in' }
   }
 }
 
 /** Short name of an action for tables (no amounts). */
 export const ACTION_SHORT: Record<Action, string> = {
-  sell_all: 'Vender todo', hold: 'Mantener', contribute: 'Aportar el 10 % del sueldo', stay_out: 'Seguir fuera',
+  sell_all: 'Vender todo', hold: 'Mantener', contribute: 'Aportar el 10 % del sueldo', stay_out: 'Seguir en efectivo',
   buy_back: 'Volver a invertir', invest_raise_0: 'No invertir la subida', invest_raise_50: 'Invertir la mitad de la subida',
   invest_raise_100: 'Invertir toda la subida',
 }
