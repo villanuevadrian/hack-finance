@@ -79,7 +79,7 @@ frontend/               juego + panel del banco
 data/                   catalog (snapshots con fecha y fuente), study (protocolo, solo agregados)
 tests/                  unit, property, integration
 reports/                salida de validación
-pitch/                  PDF, presentación, guion
+pitch/                  PDF de una página y fuentes
 docs/                   spec, roles, requisitos, decisiones, estado
 ```
 

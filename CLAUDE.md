@@ -35,7 +35,7 @@ data/catalog/         snapshots JSON del catálogo (fecha + fuente)
 data/study/           solo resultados agregados y anónimos
 data/cache/           textos generados cacheados
 reports/              salida de `make validate`
-pitch/                PDF, presentación, guion
+pitch/                PDF de una página y fuentes
 tests/  docs/
 ```
 Flujo: `scenarios → game → inference (posterior) → portfolio → Profile + PortfolioProposal → panel`.
