@@ -45,3 +45,7 @@ select = ["E", "F", "I", "B", "UP", "N"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["contracts", "behaviorlab", "api"]
+
+[tool.ruff.lint.per-file-ignores]
+# Report prose in Spanish: long lines are text, not code
+"scripts/validate.py" = ["E501"]

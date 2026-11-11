@@ -47,8 +47,8 @@ run-web: ## Arranca el frontend en http://localhost:$(WEB_PORT) (necesita make r
 test-web: ## Tests, lint y build del frontend
 	cd frontend && npm test && npm run lint && npm run build
 
-validate: ## Batería de validación -> reports/validation.md (pendiente)
-	@echo "validate pendiente: lo implementa Datos (V1-V4)"; exit 1
+validate: ## Batería de validación (V1, V1b, V2, V4) -> reports/validation.md
+	$(BIN)/python scripts/validate.py
 
 clean:
 	rm -rf $(VENV) .pytest_cache .ruff_cache *.egg-info frontend/node_modules frontend/dist
