@@ -49,7 +49,7 @@ export function World3D({ run, world, avatar, reducedMotion }: Props) {
         <fog attach="fog" args={[world.sky, 15, 38]} />
         <ambientLight intensity={0.9} color="#b9b0ff" />
         <directionalLight position={[-6, 10, 6]} intensity={2.2} color="#e6e0ff" castShadow shadow-mapSize={[1024, 1024]} />
-        <CameraRig width={n * SPACING} focusX={x(current)} reducedMotion={reducedMotion} />
+        <CameraRig width={n * SPACING} focusX={x(current)} topY={Math.max(...heights, 1) + topOffset(world.kind) + 1.3} reducedMotion={reducedMotion} />
 
         <Island width={n * SPACING} world={world} />
 
@@ -57,6 +57,7 @@ export function World3D({ run, world, avatar, reducedMotion }: Props) {
           const revealed = i < heights.length
           return (
             <group key={i} position={[x(i), 0, 0]}>
+              <MonthLabel n={i + 1} current={i === current} />
               <mesh position={[0, 0.03, 0]} receiveShadow>
                 <boxGeometry args={[0.98, 0.06, 0.98]} />
                 <meshStandardMaterial color={PHASE_COLOR[phaseOf(i, phaseRounds)]} emissive={PHASE_COLOR[phaseOf(i, phaseRounds)]} emissiveIntensity={revealed ? 0.5 : 0.08} />
@@ -82,30 +83,59 @@ export function World3D({ run, world, avatar, reducedMotion }: Props) {
   )
 }
 
+/** Month number painted on a small sign in front of each column, so the row reads as a calendar. */
+function MonthLabel({ n, current }: { n: number; current: boolean }) {
+  const tex = useMemo(() => {
+    const c = document.createElement('canvas')
+    c.width = 128
+    c.height = 64
+    const g = c.getContext('2d')!
+    g.fillStyle = current ? '#ffc94a' : '#1c1742'
+    g.beginPath()
+    g.roundRect(4, 4, 120, 56, 14)
+    g.fill()
+    g.fillStyle = current ? '#1a1300' : '#f4f1ff'
+    g.font = 'bold 34px sans-serif'
+    g.textAlign = 'center'
+    g.textBaseline = 'middle'
+    g.fillText(`Mes ${n}`, 64, 34)
+    const t = new THREE.CanvasTexture(c)
+    t.colorSpace = THREE.SRGBColorSpace
+    return t
+  }, [n, current])
+  return (
+    <mesh position={[0, 0.2, 0.62]}>
+      <planeGeometry args={[0.78, 0.39]} />
+      <meshBasicMaterial map={tex} transparent toneMapped={false} />
+    </mesh>
+  )
+}
+
 /** Extra height of the decoration on top of a column (a canopy, a roof), so the player stands on it. */
 function topOffset(kind: World['kind']): number {
   return kind === 'forest' ? 0.55 : kind === 'fortress' ? 0.12 : 0.08
 }
 
-function CameraRig({ width, focusX, reducedMotion }: { width: number; focusX: number; reducedMotion: boolean }) {
+function CameraRig({ width, focusX, topY, reducedMotion }: { width: number; focusX: number; topY: number; reducedMotion: boolean }) {
   const { camera, size } = useThree()
   const centre = useRef(0)
   useFrame(({ clock }) => {
     const cam = camera as THREE.PerspectiveCamera
     const aspect = size.width / size.height
-    // On narrow screens the camera follows the player and shows about seven weeks; otherwise the whole row.
+    // The camera follows the player and frames about seven months, so the columns are big enough to read.
     const narrow = aspect < 1.4
-    const visible = narrow ? 7 * SPACING : width
+    const visible = Math.min(width, 7 * SPACING)
     const limit = Math.max(0, (width - visible) / 2)
-    const target = narrow ? THREE.MathUtils.clamp(focusX, -limit, limit) : 0
+    const target = THREE.MathUtils.clamp(focusX, -limit, limit)
     centre.current = reducedMotion ? target : THREE.MathUtils.lerp(centre.current, target, 0.06)
-    // Distance so the visible part fits horizontally: d = (w / 2) / (tan(fov / 2) * aspect).
+    // Distance so the visible months fit both across (width) and up (from the island to the tallest column).
     const half = THREE.MathUtils.degToRad(cam.fov / 2)
-    const d = Math.max(9, (visible / 2 + 0.5) / (Math.tan(half) * aspect)) * (narrow ? 1.12 : 1)
+    const dAcross = (visible / 2 + 0.6) / (Math.tan(half) * aspect)
+    const dUp = ((topY + 0.8) / 2 + 0.4) / Math.tan(half)
+    const d = Math.max(5, dAcross, dUp) * (narrow ? 1.12 : 1)
     const sway = reducedMotion ? 0 : Math.sin(clock.elapsedTime * 0.15) * 0.18
-    // On narrow screens the HUD covers the top of the stage: aim a bit higher so the scene sits lower.
-    const lookY = narrow ? 3.0 : 1.7
-    cam.position.set(centre.current + d * Math.sin(sway), 3.6 + d * 0.12, d * Math.cos(sway))
+    const lookY = Math.max(1.2, (topY - 0.6) / 2)
+    cam.position.set(centre.current + d * Math.sin(sway), lookY + 1.2 + d * 0.1, d * Math.cos(sway))
     cam.lookAt(centre.current, lookY, 0)
   })
   return null

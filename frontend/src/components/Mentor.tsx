@@ -104,7 +104,6 @@ function HelpChat({ screen }: { screen: string }) {
     try {
       const r = await api.ask(text, screen)
       setLog((l) => [...l, { q: text, a: r.answer }])
-      voice.speak(r.answer)
     } catch {
       setLog((l) => [...l, { q: text, a: 'Ahora no puedo responder: mi servidor no tiene todavía la ayuda activada (nucleo-backend.patch).' }])
     } finally {
@@ -119,7 +118,12 @@ function HelpChat({ screen }: { screen: string }) {
         {log.map((m, i) => (
           <div key={i} className="help-pair">
             <p className="help-q">{m.q}</p>
-            <p className="help-a">{m.a}</p>
+            <p className="help-a">
+              {m.a}
+              {voice.available && (
+                <button className="speak help-speak" onClick={() => voice.speak(m.a)} disabled={!voice.on} aria-label="Escuchar la respuesta">🔊</button>
+              )}
+            </p>
           </div>
         ))}
         {busy && <p className="help-a muted">Pensando…</p>}

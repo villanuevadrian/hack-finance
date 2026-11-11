@@ -1,7 +1,7 @@
 # frontend/
 
 Juego, ficha "Crea tu yo inversor", plan con informe de idoneidad y panel del banco. React + Vite + TypeScript
-(D8). **Todas las cifras vienen de la API** (`backend/api/main.py`); aquí no se
+(D8). Dueño: Frontend (Informática 2). **Todas las cifras vienen de la API** (`backend/api/main.py`); aquí no se
 calcula ninguna propuesta ni ningún nivel.
 
 ## Arrancar

@@ -68,10 +68,16 @@ export function Game({ game, world, avatar, goal, timeoutMs, busy, error, onDeci
           <strong>{formatEur(wealth)}</strong>
         </div>
       </header>
+      <dl className="hud-stats">
+        <div><dt>Invertido</dt><dd>{formatEur(game.invested_eur)}</dd></div>
+        <div><dt>En efectivo</dt><dd>{formatEur(game.cash_eur)}</dd></div>
+        <div><dt>Bajo tu máximo</dt><dd className={belowPeak >= 0.5 ? 'neg' : undefined}>{belowPeak >= 0.5 ? `−${formatEur(belowPeak)}` : 'En máximos'}</dd></div>
+        <div><dt>Sueldo</dt><dd>{formatEur(game.salary_eur)}{game.monthly_auto_invest_eur > 0 && ` (inviertes ${formatEur(game.monthly_auto_invest_eur)})`}</dd></div>
+      </dl>
 
       <section className="step-block" aria-labelledby="step1">
         <h2 id="step1" className="step-label"><span>1</span> Qué ha pasado este mes</h2>
-        <EventCard game={game} belowPeak={belowPeak} />
+        <EventCard game={game} />
       </section>
 
       <section className="step-block" aria-labelledby="step2">
@@ -84,6 +90,7 @@ export function Game({ game, world, avatar, goal, timeoutMs, busy, error, onDeci
           ) : (
             <div className="stage-2d"><WealthChart run={run} /></div>
           )}
+          <p className="stage-legend">Cada columna es tu dinero en un mes. La bandera marca tu máximo.</p>
           <div className="hud-bottom">
             <div className="hud-chip hud-mission"><span aria-hidden="true">{mission.icon}</span> <span><span className="hud-k">Misión</span>{mission.text}</span></div>
             {webgl && (
@@ -100,7 +107,7 @@ export function Game({ game, world, avatar, goal, timeoutMs, busy, error, onDeci
   )
 }
 
-function EventCard({ game, belowPeak }: { game: GameState; belowPeak: number }) {
+function EventCard({ game }: { game: GameState }) {
   const life = lifeEventFor(game)
   const news = headlineFor(game)
   const move = lastMoveEur(game)
@@ -131,12 +138,6 @@ function EventCard({ game, belowPeak }: { game: GameState; belowPeak: number }) 
         ) : (
           <p className="eb-move"><span className="hud-k">Tu inversión este mes</span><strong>Sin cambios</strong></p>
         )}
-        <dl className="ec-stats">
-          <div><dt>Invertido</dt><dd>{formatEur(game.invested_eur)}</dd></div>
-          <div><dt>En efectivo</dt><dd>{formatEur(game.cash_eur)}</dd></div>
-          <div><dt>Bajo tu máximo</dt><dd className={belowPeak >= 0.5 ? 'neg' : undefined}>{belowPeak >= 0.5 ? `−${formatEur(belowPeak)}` : 'En máximos'}</dd></div>
-          <div><dt>Sueldo</dt><dd>{formatEur(game.salary_eur)}</dd></div>
-        </dl>
       </div>
     </div>
   )

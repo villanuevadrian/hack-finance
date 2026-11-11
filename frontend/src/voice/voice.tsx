@@ -23,6 +23,17 @@ function readPref(): boolean {
   }
 }
 
+/**
+ * The most natural Spanish voice the device has: high-quality voices first (Google's in Chrome, the "enhanced"
+ * or "premium" ones of macOS), then any voice from Spain, then any Spanish voice.
+ */
+function bestSpanishVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | undefined {
+  const es = voices.filter((v) => v.lang.toLowerCase().startsWith('es'))
+  const score = (v: SpeechSynthesisVoice) =>
+    (/google|premium|enhanced|mejorada|natural|neural/i.test(v.name) ? 4 : 0) + (v.lang === 'es-ES' ? 2 : 0) + (v.localService ? 0 : 1)
+  return [...es].sort((a, b) => score(b) - score(a))[0]
+}
+
 function browserSpeak(text: string, onStart?: () => void, onBlocked?: () => void): void {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
   const synth = window.speechSynthesis
@@ -30,7 +41,7 @@ function browserSpeak(text: string, onStart?: () => void, onBlocked?: () => void
   const u = new SpeechSynthesisUtterance(text)
   u.lang = 'es-ES'
   u.rate = 1.03
-  const voice = synth.getVoices().find((v) => v.lang.startsWith('es-ES')) ?? synth.getVoices().find((v) => v.lang.startsWith('es'))
+  const voice = bestSpanishVoice(synth.getVoices())
   if (voice) u.voice = voice
   u.onstart = () => onStart?.()
   u.onerror = (e) => {

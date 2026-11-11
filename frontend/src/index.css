@@ -862,3 +862,60 @@ a.mode:hover { color: var(--ink); border-color: var(--muted); }
 .scen-mid { position: absolute; top: 1px; width: 12px; height: 14px; margin-left: -6px; border-radius: 4px; background: var(--ink); border: 2px solid var(--void); }
 .scen-put { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--gold); }
 .scen-vals { display: flex; justify-content: space-between; gap: 6px; font-family: var(--display); font-weight: 700; }
+
+.help-speak { margin-left: 6px; vertical-align: middle; }
+
+/* ===== Game fits one screen: compact rows ===== */
+.app[data-screen='game'] { padding-top: 14px; padding-bottom: 20px; }
+.app[data-screen='game'] .brand { margin-bottom: 10px; }
+.game2 { gap: 10px; }
+.game2 .step-block { gap: 6px; }
+.game2 .step-label { font-size: 1rem; gap: 8px; }
+.game2 .step-label span { width: 24px; height: 24px; font-size: 0.85rem; border-radius: 8px; }
+.game-hud .hud-chip { padding: 6px 12px; }
+.game-hud .hud-level-n { width: 32px; height: 32px; font-size: 1.1rem; }
+.game-hud .hud-money strong { font-size: 1.3rem; }
+.hud-stats { margin: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.hud-stats div { padding: 6px 10px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line); display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.hud-stats dt { font-size: 0.75rem; color: var(--muted); }
+.hud-stats dd { margin: 0; font-family: var(--display); font-weight: 700; font-size: 0.95rem; white-space: nowrap; }
+.event-banner { padding: 10px 14px; gap: 12px; }
+.event-banner .ec-icon { width: 42px; height: 42px; font-size: 1.6rem; border-radius: 12px; }
+.event-banner .ec-title { font-size: 1rem; }
+.event-banner .ec-text { font-size: 0.85rem; }
+.event-banner .ec-headline { font-size: 1.15rem; }
+.event-banner .eb-move strong { font-size: 1.4rem; }
+.game2 .stage-view { height: clamp(210px, 32vh, 360px); min-height: 210px; }
+.stage-legend {
+  position: absolute; top: 10px; left: 50%; transform: translateX(-50%); margin: 0; padding: 4px 12px; border-radius: 999px;
+  font-size: 0.78rem; color: var(--ink); background: rgb(16 12 38 / 0.72); border: 1px solid rgb(170 164 216 / 0.25); white-space: nowrap;
+}
+.game2 .hud-bottom { bottom: 8px; left: 8px; right: 8px; }
+.game2 .hud-mission { font-size: 0.8rem; padding: 4px 10px; }
+.game2 .hud-mission > span:first-child { font-size: 1.1rem; }
+.game2 .cards-row { gap: 12px; }
+.game2 .play-card {
+  min-height: 0; grid-template-columns: auto 1fr; justify-items: start; text-align: left; align-items: center;
+  column-gap: 12px; row-gap: 0; padding: 12px 14px 12px 42px; border-radius: 16px;
+  box-shadow: 0 6px 0 color-mix(in srgb, var(--c) 45%, #0b0820), 0 10px 20px rgb(0 0 0 / 0.3);
+}
+.game2 .pc-art { grid-row: span 2; width: 46px; height: 46px; }
+.game2 .pc-art svg { width: 24px; height: 24px; }
+.game2 .pc-name { font-size: 1.05rem; }
+.game2 .pc-desc { font-size: 0.8rem; }
+.game2 .play-card kbd { top: 50%; left: 10px; transform: translateY(-50%); }
+.game2 .hand { gap: 8px; }
+.game2 .hand-head h2 { font-size: 1rem; }
+.game2 .fuse { height: 18px; }
+.game2 .fuse b { line-height: 16px; font-size: 0.75rem; }
+.game2 .hand-foot { gap: 8px; }
+@media (max-width: 900px) {
+  .hud-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stage-legend { font-size: 0.7rem; white-space: normal; text-align: center; width: max-content; max-width: 90%; }
+}
+.game2 { grid-template-columns: minmax(0, 1fr); }
+.game2 > * { min-width: 0; }
+.game-hud .hud-months { overflow: hidden; }
+.game-hud .hud-months .levelmap { min-width: 0; }
+.stage-legend { left: auto; right: 10px; transform: none; }
+@media (max-width: 900px) { .stage-legend { right: 8px; left: 8px; width: auto; max-width: none; } }
