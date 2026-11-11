@@ -2,8 +2,8 @@
 
 Shape parameters of each episode (how the drop is split between phases and how much
 is recovered) are game-design choices added by Núcleo to turn the episode table into
-15 monthly rounds. TODO(Álvaro): review the `first_leg_share`, `recovery_share` and
-`PRE_RISE_*` values below.
+15 monthly rounds. Reviewed and accepted by Producto (Álvaro, 11-nov): `first_leg_share`,
+`recovery_share` and `PRE_RISE_*` values below.
 """
 
 from dataclasses import dataclass
@@ -11,8 +11,9 @@ from dataclasses import dataclass
 from contracts import Episode
 
 # CALIBRACION.md §2 (annual figures)
-# TODO(Álvaro): Cartera Ahorro (monetarios) has no backtest and is simulated as the RF
-# index (7,5 % vol), which overstates its risk. It needs its own volatility.
+# Cartera Ahorro (monetarios) has no backtest and is simulated as the RF index (7,5 % vol),
+# which overstates its risk. Accepted by Producto (11-nov) as a documented, conservative
+# simplification; known limitation for the pitch.
 RV_VOL = 0.125
 RF_VOL = 0.075
 RV_RF_CORR = 0.10
@@ -32,7 +33,7 @@ END_A = 5
 END_B = 10
 END_C = 15
 
-# TODO(Álvaro): size of the rise in round 1 ("viene de subir"), design choice
+# Size of the rise in round 1 ("viene de subir"). Accepted by Producto (11-nov).
 PRE_RISE_RV = 0.03
 PRE_RISE_RF = 0.002
 

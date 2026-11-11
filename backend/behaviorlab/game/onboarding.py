@@ -29,14 +29,14 @@ DEFAULT_AMOUNT_EUR = 10_000.0  # CALIBRACION.md §7
 DEFAULT_SALARY_EUR = 1_800.0  # CALIBRACION.md §7
 
 # CALIBRACION.md §7: salary = midpoint of the S1 range.
-# TODO(Álvaro): open-ended ranges (< 1.000 and > 4.000) have no midpoint; values below are
-# a design choice pending review.
+# Open-ended ranges (< 1.000 and > 4.000) have no midpoint.
+# Decided by Producto (Álvaro, 11-nov): 800 and 5.000.
 SALARY_BY_INCOME: dict[Income, float] = {
-    Income.LT_1000: 750.0,
+    Income.LT_1000: 800.0,
     Income.FROM_1000_TO_1800: 1_400.0,
     Income.FROM_1800_TO_2500: 2_150.0,
     Income.FROM_2500_TO_4000: 3_250.0,
-    Income.GT_4000: 4_500.0,
+    Income.GT_4000: 5_000.0,
 }
 
 # CUESTIONARIO.md §6: level by horizon, with the catalog's minimum horizons

@@ -39,7 +39,8 @@ from contracts import (
 
 CONTRIBUTION_SHARE = 0.10  # D2: "aportar el 10 % del sueldo"
 DEFAULT_TIMEOUT_MS = 15_000  # CALIBRACION.md §8, rule 4
-# TODO(Álvaro): below this portfolio drop the chosen episode teaches little about theta and
+# Accepted by Producto (11-nov): below this portfolio drop the chosen episode teaches
+# little about theta and
 # `inflacion` (equity and bonds fall together) is used instead (CALIBRACION.md §4).
 MIN_INFORMATIVE_DROP = 0.10
 

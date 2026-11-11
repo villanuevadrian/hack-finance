@@ -23,8 +23,10 @@ import numpy as np
 from behaviorlab.scenarios import simulate_monthly_returns
 from contracts import CandidateMetrics, Catalog, Posterior, SuitabilityLevels
 
-# TODO(Álvaro, Amanda): D5 threshold "lo fijan Producto y Datos". Provisional value.
-DEFAULT_MAX_PANIC_PROB = 0.20
+# D5 threshold. Decided by Producto (Álvaro, 11-nov): 0.30, because 0.20 proposed
+# conservative portfolios even to players who hold through the drops.
+# Datos may refine it with V1/V2.
+DEFAULT_MAX_PANIC_PROB = 0.30
 DEFAULT_N_PATHS = 2_000
 
 

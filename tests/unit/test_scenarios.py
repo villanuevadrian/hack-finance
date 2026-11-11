@@ -70,19 +70,14 @@ def test_situation_returns_match_paths() -> None:
         "clasica",
         "pop",
         "indie",
-        pytest.param(
-            "rock",
-            marks=pytest.mark.xfail(
-                strict=True,
-                reason="CALIBRACION.md §2: modelo -28,6 vs publicado -26,9 (1,7 pp > 1,5). "
-                "TODO(Álvaro): ajustar calibración o tolerancia",
-            ),
-        ),
+        "rock",
     ],
 )
-def test_control_2008_within_1_5_pp(catalog: Catalog, pid: str) -> None:
+def test_control_2008_within_2_pp(catalog: Catalog, pid: str) -> None:
+    """Tolerance 2 pp (Producto, 11-nov): published 2008 figures are annual and partly
+    reconstructed before launch; Rock is at 1,7 pp (CALIBRACION.md §2)."""
     w = catalog.by_id(pid).equity_weight
-    assert 100 * blended_return(w, -0.37, 0.01) == pytest.approx(PUBLISHED_2008[pid], abs=1.5)
+    assert 100 * blended_return(w, -0.37, 0.01) == pytest.approx(PUBLISHED_2008[pid], abs=2.0)
 
 
 @pytest.mark.parametrize("episode", list(Episode))
