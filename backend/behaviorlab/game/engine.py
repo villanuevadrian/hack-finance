@@ -16,6 +16,8 @@ Money:
   HOLD, STAY_OUT or INVEST_RAISE_0 (CALIBRACION.md §8, rule 4).
 """
 
+import os
+
 import numpy as np
 
 from behaviorlab.game.onboarding import (
@@ -38,7 +40,8 @@ from contracts import (
 )
 
 CONTRIBUTION_SHARE = 0.10  # D2: "aportar el 10 % del sueldo"
-DEFAULT_TIMEOUT_MS = 15_000  # CALIBRACION.md §8, rule 4
+# CALIBRACION.md §8, rule 4. Configurable (BEHAVIORLAB_DECISION_TIMEOUT_MS); default 15 s.
+DEFAULT_TIMEOUT_MS = int(os.environ.get("BEHAVIORLAB_DECISION_TIMEOUT_MS", "15000"))
 # TODO(Álvaro): below this portfolio drop the chosen episode teaches little about theta and
 # `inflacion` (equity and bonds fall together) is used instead (CALIBRACION.md §4).
 MIN_INFORMATIVE_DROP = 0.10
