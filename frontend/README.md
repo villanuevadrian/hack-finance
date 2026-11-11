@@ -32,7 +32,7 @@ make setup-web && make run-web             # http://localhost:5280 (CORS de la A
    lenguaje llano con confirmación. La misión (O1) decide el mundo.
 3. **Partida**: 15 meses en 3 niveles, con una lección de producto antes de cada nivel (`src/learning.ts`, nunca dice
    cómo reaccionar). Los botones son los de `available_actions`, en el orden que manda el backend (que los baraja cada
-   ronda). 15 s por decisión: si no decide, se envía `action: null`. Texto opcional de cómo se siente (RF-08).
+   ronda). 30 s por decisión: si no decide, se envía `action: null`. Texto opcional de cómo se siente (RF-08).
    Movimientos en euros y en meses de sueldo (CALIBRACION.md §8). Sin puntos ni rangos.
 4. **Tu plan**: `Profile` + `PortfolioProposal` + posterior: propuesta y justificación del backend, los tres niveles y
    cuál limita, mapa de carteras del catálogo, lo declarado frente a lo revelado e **informe de idoneidad** imprimible.
@@ -66,7 +66,7 @@ el entorno de desarrollo: pruébalo con una clave real antes de la demo.
   `ANTHROPIC_API_KEY` en el servidor usa Claude con límites estrictos (nunca da consejos de inversión ni valora
   decisiones); sin clave, responde con preguntas frecuentes fijas. No está disponible durante las rondas.
 - **Tiempo por decisión:** el frontend lo lee del servidor (`GET /config`), así el reloj y el motor coinciden. Se
-  cambia con `BEHAVIORLAB_DECISION_TIMEOUT_MS` (por defecto 15 000, la regla de CALIBRACION.md; cambiarlo es
+  cambia con `BEHAVIORLAB_DECISION_TIMEOUT_MS` (por defecto 30 000, la regla de CALIBRACION.md; cambiarlo es
   decisión de Producto).
 - **Equipo del avatar:** cada bloque completado de la ficha desbloquea una pieza (capa, hombreras, escudo, botas y
   estandarte), igual para todos: nunca depende de lo que se responde.
