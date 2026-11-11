@@ -1,0 +1,159 @@
+{
+  "_comment": "Single source of every narrated text. Used by the app (captions) and by scripts/gen-voice.mjs (audio). No figures, no advice on how to decide, no episode names or dates.",
+  "mentor": {
+    "intro": "¡Hola! Soy Vega y voy a acompañarte en este viaje. Primero crearemos tu yo inversor: tú, tal como eres hoy. Después vivirás quince meses de mercado con tu dinero simulado. No hay respuestas buenas ni malas.",
+    "onboarding": "Todo lo que me cuentes son tus datos de verdad. Si no sabes algo, dilo: es mejor que adivinar.",
+    "world_city": "Tu misión te ha traído a La Ciudad. Cada mes levantarás un edificio con la altura de tu dinero. Vas a recorrer tres zonas: la caída, el ascenso y la recuperación.",
+    "world_forest": "Tu misión te ha traído a El Bosque. Cada mes crecerá un árbol con la altura de tu dinero. Vas a recorrer tres zonas: la caída, el ascenso y la recuperación.",
+    "world_fortress": "Tu misión te ha traído a La Fortaleza. Cada mes se alzará una torre con la altura de tu dinero. Vas a recorrer tres zonas: la caída, el ascenso y la recuperación.",
+    "world_peaks": "Tu misión te ha traído a Las Cumbres. Cada mes dibujarás un pico con la altura de tu dinero. Vas a recorrer tres zonas: la caída, el ascenso y la recuperación.",
+    "level_drop": "Primera zona: La caída. Antes de entrar, algo que conviene saber.",
+    "level_salary": "Segunda zona: El ascenso. Antes de entrar, algo que conviene saber.",
+    "level_recovery": "Última zona: La recuperación. Antes de entrar, algo que conviene saber.",
+    "map_1": "Has cruzado la primera zona. El camino sigue.",
+    "map_2": "Segunda zona superada. Ya solo queda una.",
+    "map_3": "Has recorrido tu mundo entero. Vamos a ver tu plan.",
+    "results": "Este es tu plan. Sale de lo que me contaste y de cómo decidiste durante el viaje. Recuerda: es una evaluación de idoneidad, no un consejo.",
+    "onboarding_who": "Empezamos por ti: tus estudios y a qué te dedicas. Contesta como eres hoy.",
+    "onboarding_inventory": "Ahora tu inventario: qué productos conoces y cuáles has usado. Sin presión, no hay respuestas mejores.",
+    "onboarding_quiz": "Tres retos rápidos. Si no sabes una respuesta, elige «No lo sé»: es mucho mejor que adivinar.",
+    "onboarding_base": "Tu base: ingresos, ahorro y colchón. Si prefieres no responder algo, puedes, pero sin lo esencial no podré preparar tu plan.",
+    "onboarding_mission": "Y tu misión: para qué es este dinero y cuándo lo necesitarás. De aquí sale tu mundo.",
+    "onboarding_summary": "Repasa tu ficha con calma. Si algo no es correcto, edítalo antes de empezar."
+  },
+  "lessons": {
+    "drop": {
+      "title": "Qué hay dentro de un fondo indexado",
+      "points": [
+        "Un fondo junta el dinero de muchas personas y lo invierte en muchos activos a la vez.",
+        "Un fondo indexado copia un índice, por ejemplo las mayores empresas del mundo, en lugar de elegir valores.",
+        "Repartir el dinero entre muchas empresas se llama diversificar: reduce el efecto de que una sola vaya mal, pero no elimina el riesgo de que caiga todo el mercado."
+      ]
+    },
+    "salary": {
+      "title": "El coste que no se ve",
+      "points": [
+        "Los fondos cobran comisiones cada año, como un porcentaje de lo que tienes invertido.",
+        "Las comisiones se restan aunque el fondo pierda dinero.",
+        "Una diferencia pequeña de comisión, repetida muchos años, puede suponer mucho dinero al final."
+      ]
+    },
+    "recovery": {
+      "title": "Cómo leer el riesgo de un producto",
+      "points": [
+        "Los productos de inversión europeos llevan un documento de datos fundamentales con un indicador de riesgo del 1 al 7.",
+        "Un 1 indica movimientos pequeños y poco riesgo de pérdida; un 7, movimientos grandes y más riesgo.",
+        "El indicador no garantiza nada: un producto de riesgo bajo también puede perder dinero."
+      ]
+    }
+  },
+  "life": [
+    {
+      "icon": "💼",
+      "title": "Empieza tu año",
+      "text": "Cobras tu nómina y pagas tus gastos fijos, como cada mes. Tu inversión va aparte."
+    },
+    {
+      "icon": "🏠",
+      "title": "Día de pagar el alquiler",
+      "text": "Sale de tu sueldo, como siempre. Tu inversión no se toca."
+    },
+    {
+      "icon": "🍕",
+      "title": "Cena con amigos",
+      "text": "Un buen plan de viernes, pagado con lo que te sobra del mes."
+    },
+    {
+      "icon": "🧺",
+      "title": "Un imprevisto",
+      "text": "Se estropea la lavadora. La pagas con tu colchón de emergencia, sin tocar la inversión."
+    },
+    {
+      "icon": "📱",
+      "title": "Un mes normal",
+      "text": "Trabajo, rutina y alguna serie. Nada fuera de lo habitual."
+    },
+    {
+      "icon": "☕",
+      "title": "Nuevo proyecto en el trabajo",
+      "text": "Mucho lío en la oficina, pero tus gastos siguen como siempre."
+    },
+    {
+      "icon": "🛒",
+      "title": "La compra de siempre",
+      "text": "Llenas la nevera con tu sueldo, como cada mes."
+    },
+    {
+      "icon": "🚲",
+      "title": "Te mueves más",
+      "text": "Empiezas a ir en bici al trabajo. Ahorras en transporte."
+    },
+    {
+      "icon": "🎂",
+      "title": "Cumpleaños de tu hermana",
+      "text": "Un regalo pagado con lo que te sobra del mes."
+    },
+    {
+      "icon": "🏖️",
+      "title": "Unos días libres",
+      "text": "Escapada corta, pagada con tu sueldo. La inversión sigue a lo suyo."
+    },
+    {
+      "icon": "🔧",
+      "title": "Revisión del coche",
+      "text": "La cubres con tu colchón de emergencia, como estaba previsto."
+    },
+    {
+      "icon": "📚",
+      "title": "Un curso nuevo",
+      "text": "Te apuntas a un curso por las tardes. Lo pagas con tu sueldo."
+    },
+    {
+      "icon": "🌧️",
+      "title": "Mes tranquilo",
+      "text": "Llueve mucho y sales poco. Tus gastos, como siempre."
+    },
+    {
+      "icon": "🎁",
+      "title": "Se acercan las fiestas",
+      "text": "Regalos y planes, pagados con tu sueldo del mes."
+    },
+    {
+      "icon": "🏁",
+      "title": "Último mes del año",
+      "text": "Haces balance del año. Tus gastos, como siempre."
+    }
+  ],
+  "raise": {
+    "icon": "🎉",
+    "title": "Te suben el sueldo",
+    "text": "Tu esfuerzo se nota en la nómina. ¿Qué haces con el dinero extra?"
+  },
+  "headlines": {
+    "strong_drop": [
+      "Fuertes caídas en las bolsas de todo el mundo",
+      "Los inversores venden: el pesimismo se extiende",
+      "Jornadas de pánico en los mercados"
+    ],
+    "drop": [
+      "Los mercados cierran el mes en rojo",
+      "Crece la preocupación por la economía",
+      "Los analistas recortan sus previsiones"
+    ],
+    "flat": [
+      "Mes tranquilo en los mercados, sin una dirección clara",
+      "Las bolsas se mueven poco a la espera de noticias",
+      "Calma tensa en los mercados"
+    ],
+    "rise": [
+      "Los mercados recuperan terreno",
+      "Mejoran los datos de empleo y consumo",
+      "Las bolsas cierran el mes en verde"
+    ],
+    "strong_rise": [
+      "Fuertes subidas en las bolsas",
+      "Vuelve el optimismo a los mercados",
+      "Los inversores regresan a la bolsa"
+    ]
+  }
+}
