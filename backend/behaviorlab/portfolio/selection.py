@@ -12,19 +12,25 @@ Per path i with a theta_i drawn from the posterior marginal of theta:
 
     P(panic) = mean(panic_i);  P10, P50, P90 = quantiles of M_i
 
-D5: among eligible portfolios, choose argmax P10(M) subject to P(panic) <= max_panic_prob;
-if none qualifies, the one with the lowest P(panic) (ties -> lower risk level).
+Money-market portfolios (no equity and no backtest in the snapshot, e.g. Cartera Ahorro)
+do not follow the bond index: they grow at the mean of their published full-year returns,
+V_t = (1 + r)^(t/12), with no drawdown, so P(panic) = 0.
+
 D6: revealed level = highest risk level with P(panic) <= max_panic_prob (0 if none);
     final = min(revealed, capacity, horizon).
+D5 (team, 11-nov): "the portfolio you are able to hold": among portfolios with
+risk_level <= final, the HIGHEST risk level with P(panic) <= max_panic_prob; if none
+qualifies, the one with the lowest P(panic) (ties -> lower risk level). P10/P50/P90 are
+shown to the bank as information. (The previous rule, argmax P10, proposed Clásica to
+players who held through every drop, because the stress episode always favours low risk.)
 """
 
 import numpy as np
 
 from behaviorlab.scenarios import simulate_monthly_returns
-from contracts import CandidateMetrics, Catalog, Posterior, SuitabilityLevels
+from contracts import CandidateMetrics, Catalog, CatalogPortfolio, Posterior, SuitabilityLevels
 
-# D5 threshold. Decided by Producto (Álvaro, 11-nov): 0.30, because 0.20 proposed
-# conservative portfolios even to players who hold through the drops.
+# D5 threshold. Decided by Producto (Álvaro, 11-nov): 0.30.
 # Datos may refine it with V1/V2.
 DEFAULT_MAX_PANIC_PROB = 0.30
 DEFAULT_N_PATHS = 2_000
@@ -35,6 +41,23 @@ def sample_theta(posterior: Posterior, rng: np.random.Generator, n: int) -> np.n
     grid = np.asarray(posterior.grid["theta"])
     weights = np.asarray(posterior.marginals["theta"])
     return rng.choice(grid, size=n, p=weights / weights.sum())
+
+
+def money_market_annual_return(portfolio: CatalogPortfolio) -> float | None:
+    """Mean of the published full-year returns for money-market portfolios, else None.
+
+    r = mean(annual_returns_pct[y] for full years y) / 100. A portfolio counts as money market
+    when it has no equity and no backtest in the snapshot (the bond index does not apply).
+    """
+    if portfolio.equity_pct > 0 or portfolio.backtest is not None:
+        return None
+    full_years = [v for k, v in portfolio.annual_returns_pct.items() if k.isdigit()]
+    return float(np.mean(full_years)) / 100 if full_years else None
+
+
+def simulate_money_market(annual_return: float, n_paths: int, n_months: int) -> np.ndarray:
+    """Final multiples of a money-market portfolio: (1 + r)^(n_months / 12), same on every path."""
+    return np.full(n_paths, (1 + annual_return) ** (n_months / 12))
 
 
 def simulate_candidate(
@@ -77,7 +100,12 @@ def evaluate_candidates(
     thetas = sample_theta(posterior, rng, n_paths)
     out = []
     for p in sorted(catalog.portfolios, key=lambda x: x.risk_level):
-        final, panicked = simulate_candidate(p.equity_weight, rv, rf, thetas)
+        mm_return = money_market_annual_return(p)
+        if mm_return is not None:
+            final = simulate_money_market(mm_return, n_paths, n_months)
+            panicked = np.zeros(n_paths, dtype=bool)
+        else:
+            final, panicked = simulate_candidate(p.equity_weight, rv, rf, thetas)
         q10, q50, q90 = np.quantile(final, [0.10, 0.50, 0.90])
         out.append(
             CandidateMetrics(
@@ -116,11 +144,11 @@ def suitability_levels(revealed: int, capacity: int, horizon: int) -> Suitabilit
 def select_portfolio(
     candidates: list[CandidateMetrics], final_level: int, max_panic_prob: float
 ) -> CandidateMetrics:
-    """D5 among candidates with risk_level <= final_level."""
+    """D5: highest risk level <= final_level with P(panic) <= threshold (see module docstring)."""
     pool = [c for c in candidates if c.risk_level <= final_level]
     if not pool:
         pool = [min(candidates, key=lambda c: c.risk_level)]
     safe = [c for c in pool if c.p_panic <= max_panic_prob]
     if safe:
-        return max(safe, key=lambda c: (c.final_multiple_p10, -c.risk_level))
+        return max(safe, key=lambda c: c.risk_level)
     return min(pool, key=lambda c: (c.p_panic, c.risk_level))

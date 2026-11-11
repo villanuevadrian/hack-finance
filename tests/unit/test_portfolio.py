@@ -10,6 +10,7 @@ from behaviorlab.portfolio import (
     simulate_candidate,
     suitability_levels,
 )
+from behaviorlab.portfolio.selection import money_market_annual_return
 from contracts import CandidateMetrics, Catalog, ParameterEstimate, Posterior
 
 
@@ -80,7 +81,27 @@ def test_revealed_level_and_final_min() -> None:
 
 def test_select_portfolio_d5() -> None:
     cands = [_cand(0, 0.0, 0.9), _cand(1, 0.1, 0.95), _cand(2, 0.1, 0.93), _cand(3, 0.5, 1.2)]
-    assert select_portfolio(cands, 3, 0.2).risk_level == 1  # best P10 among safe
-    assert select_portfolio(cands, 0, 0.2).risk_level == 0  # capped by final level
+    assert select_portfolio(cands, 3, 0.2).risk_level == 2  # highest risk that is held
+    assert select_portfolio(cands, 1, 0.2).risk_level == 1  # capped by final level
+    assert select_portfolio(cands, 0, 0.2).risk_level == 0
     risky = [_cand(1, 0.6, 1.0), _cand(2, 0.4, 1.1)]
     assert select_portfolio(risky, 2, 0.2).risk_level == 2  # none safe: lowest P(panic)
+
+
+def test_brave_player_gets_the_highest_risk_allowed(catalog: Catalog) -> None:
+    """A player who never sells, with capacity and horizon 5, must not get a cautious portfolio."""
+    cands = evaluate_candidates(_posterior_theta(0.6), catalog, 7, 5, seed=3, n_paths=400)
+    final = suitability_levels(revealed_level(cands, 0.3), 5, 5).final
+    assert final == 5
+    assert select_portfolio(cands, final, 0.3).portfolio_id == "metal"
+
+
+def test_money_market_never_panics_and_uses_published_return(catalog: Catalog) -> None:
+    ahorro = catalog.by_id("ahorro")
+    r = money_market_annual_return(ahorro)
+    assert r == pytest.approx((2.0 + 3.59 + 2.07) / 3 / 100)  # full years of the snapshot
+    assert money_market_annual_return(catalog.by_id("clasica")) is None
+    cands = evaluate_candidates(_posterior_theta(0.02), catalog, 3, 5, seed=1, n_paths=200)
+    a = next(c for c in cands if c.portfolio_id == "ahorro")
+    assert a.p_panic == 0
+    assert a.final_multiple_p10 == pytest.approx((1 + r) ** 3)

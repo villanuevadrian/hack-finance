@@ -17,6 +17,12 @@ class CatalogPortfolio(BaseModel):
     risk_level: int = Field(ge=0, le=5)
     profile: str
     min_horizon_years: int | None = Field(default=None, ge=0)
+    backtest: dict[str, float | bool] | None = Field(
+        default=None, description="Backtest metrics of the snapshot; None if not available"
+    )
+    annual_returns_pct: dict[str, float] = Field(
+        default_factory=dict, description="Published annual returns, e.g. {'2024': 3.59}"
+    )
 
     @model_validator(mode="after")
     def _weights_sum_to_100(self) -> "CatalogPortfolio":

@@ -67,7 +67,8 @@ def justification(
     names = [LEVEL_NAMES[k] for k in levels.limiting]
     limit = names[0] if len(names) == 1 else ", ".join(names[:-1]) + " y " + names[-1]
     return (
-        f"Proponemos {chosen.name} (riesgo {chosen.risk_level} de 5). El nivel máximo es "
+        f"Proponemos {chosen.name} (riesgo {chosen.risk_level} de 5): la cartera de más riesgo "
+        f"que, según tu conducta, serías capaz de mantener dentro de tu nivel. El nivel máximo es "
         f"{levels.final}, limitado por {limit}. Simulando tu forma de reaccionar en "
         f"{years} años, la probabilidad de vender en pánico con esta cartera es "
         f"{_pct(chosen.p_panic)} (umbral: {_pct(max_panic_prob)}) y, en el 10 % de los peores "
