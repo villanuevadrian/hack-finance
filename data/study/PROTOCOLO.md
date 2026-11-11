@@ -1,7 +1,15 @@
-# Protocolo de la mini-prueba (martes 10-nov, tarde)
+# Protocolo de la prueba con usuarios
 
 Dueño: Producto (Álvaro). Apoyo: Datos (Amanda) para el análisis, Frontend (Pedribel) para la versión que se prueba.
-Estado: **propuesta**. Relacionado: `docs/CUESTIONARIO.md`, `docs/DECISIONS.md` (D10, D11, D13), RNF-03.
+Estado: **diseñada y lista para ejecutar; no se ha realizado durante el hackathon** (ver sección 0). Relacionado: `docs/CUESTIONARIO.md`, `docs/DECISIONS.md` (D10, D11, D13), RNF-03.
+
+## 0. Estado (11-nov-2026)
+- La prueba **no se ha ejecutado**: la app solo corre en local y publicarla para participantes a distancia exigía quitar el chat de Vega y la voz para proteger el presupuesto, algo que el equipo no quiere hacer en la versión de demo.
+- Queda como **siguiente paso** del producto, con todo el material preparado:
+  - este protocolo y `CONSENTIMIENTO.md`;
+  - versión imprimible (consentimiento, test clásico, cuestionario final y hoja del facilitador), fuera del repo;
+  - opción a distancia: app publicada (despliegue o túnel) + test clásico en Google Forms; permitiría medir además la **tasa de abandono** de cada formato.
+- En el pitch se presenta como "validación con usuarios: protocolo listo", sin cifras inventadas.
 
 ## 1. Qué queremos saber
 | # | Pregunta | Cómo se mide | Éxito (orientativo) |
@@ -72,7 +80,7 @@ Reglas para el facilitador: no ayudar ni comentar las decisiones, no mirar la pa
 - H4: proporción de aciertos.
 - Salida: `reports/miniprueba.md` y el CSV agregado. Lo que no salga, se cuenta igual.
 
-## 11. Pendiente
-- Confirmar el martes a las 13:00 si se usa la app o el plan B.
+## 11. Para ejecutarla
+- Decidir formato: en persona con la app en un portátil, o a distancia con la app publicada.
 - Imprimir o preparar en formulario: consentimiento, test clásico, cuestionario final y hoja de registro.
 - Reservar sitio (aula o zona del hackathon) y 2-3 facilitadores.

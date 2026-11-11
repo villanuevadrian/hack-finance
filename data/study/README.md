@@ -1,5 +1,5 @@
 # data/study/
-Mini-prueba con usuarios reales. Dueño: Producto (Álvaro).
+Prueba con usuarios reales (diseñada, pendiente de ejecutar). Dueño: Producto (Álvaro).
 - `PROTOCOLO.md`: objetivos, diseño, guion, privacidad y análisis.
 - `CONSENTIMIENTO.md`: hoja de información y consentimiento.
 - `resultados_agregados.csv`: **solo** resultados agregados y anónimos (se añade tras la prueba).
