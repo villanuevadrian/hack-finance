@@ -1,54 +1,74 @@
-# BehaviorLab (nombre provisional)
+# BehaviorLab
 
 Hack Finance 2026 · Madrid Engineering Week · BEST UC3M
 
-**Qué es:** un juego corto que mide cómo reaccionan los jóvenes inversores ante caídas de mercado y subidas de sueldo. Con esa conducta estimamos un perfil con su incertidumbre y proponemos la cartera del catálogo que la persona sea capaz de mantener. Producto B2B; cliente de la demo: MyInvestor. Complementa el test de idoneidad, no lo sustituye. **No es asesoramiento financiero.**
+**Qué es:** la evaluación de idoneidad de un banco en formato de juego (D13). El cliente crea su "yo inversor" respondiendo las preguntas que exige la norma y después vive quince meses de mercado simulado: caídas, subidas de sueldo y recuperación. Con lo que **hace** (no con lo que dice) estimamos su perfil de conducta con su incertidumbre y proponemos la cartera del catálogo que sea capaz de mantener. Producto B2B para el onboarding; cliente de la demo: MyInvestor. **No es asesoramiento financiero.**
 
-## Estado
-Esqueleto. Aún no hay código. Empieza por aquí:
-1. `docs/SPEC.md` — producto, MVP por tiers, plan hasta el miércoles.
-2. `docs/ROLES.md` — elegid rol y dueños.
-3. `docs/REQUIREMENTS.md` — requisitos con ID, prioridad y dueño.
-4. `docs/DECISIONS.md` — decisiones D1-D12 a cerrar hoy (fuente de verdad de las decisiones).
-5. `docs/DUDAS.md` — hoja de dudas con recomendaciones para la reunión del domingo.
-6. `CLAUDE.md` — reglas que Claude Code carga automáticamente.
+## Demo en 3 comandos
+Requisitos: **Python 3.12**, **Node.js ≥ 20.19**, `make` y `git`. Todo se instala dentro del repo (`.venv/` y `frontend/node_modules/`), nada global.
+
+```bash
+make setup && make setup-web     # instala backend y frontend con versiones fijadas
+make run-api                     # terminal 1: API en http://127.0.0.1:8000 (docs en /docs)
+make run-web                     # terminal 2: juego y panel del banco en http://localhost:5173
+```
+
+Abrid http://localhost:5173, cread vuestro "yo inversor", jugad las 15 rondas y al final veréis el perfil, la cartera propuesta, el informe de idoneidad, la "revelación" (el mismo mercado jugado con otras decisiones) y el panel del banco.
+
+## Tests
+```bash
+make test        # backend: tests unitarios, de propiedades (Hypothesis) e integración de la API
+make lint        # backend: ruff
+make test-web    # frontend: tests (vitest), lint (oxlint) y build
+```
+La CI de GitHub ejecuta las dos baterías en cada PR y en cada push a `main`.
+
+## Configuración
+Todo funciona sin configurar nada. Opcional, en un `.env` en la raíz (copiad `.env.example`; **nunca se sube**). `make run-api` lo carga solo:
+
+| Variable | Para qué |
+|---|---|
+| `ANTHROPIC_API_KEY` | Vega, la ayudante, responde con Claude. Sin clave (o si falla la red) responde con preguntas frecuentes fijas. `GET /config` indica `"assistant_uses_claude"` |
+| `BEHAVIORLAB_DECISION_TIMEOUT_MS` | Tiempo por decisión (por defecto 15 000) |
+| `BEHAVIORLAB_DATA_DIR` | Carpeta donde guardar las partidas para que sobrevivan a un reinicio (por defecto, solo en memoria). Debe quedar fuera de git |
+| `VITE_ENABLE_VOICE`, `VITE_API_URL` | En `frontend/.env` (ver `frontend/.env.example`): voz pregrabada (T2; sin ella, subtítulos) y dirección de la API (por defecto `http://localhost:8000`) |
+
+Claude **nunca** calcula cifras: todos los números salen de código determinista con tests.
+
+Si `python3.12` no está en el PATH: `make setup PYTHON=/ruta/a/python3.12`. En Windows, usad WSL. Las versiones exactas del backend están en `requirements-lock.txt` (`make lock` para regenerarlo) y las del frontend en `frontend/package-lock.json`.
+
+## Cómo funciona
+```
+cuestionario ─► game (15 rondas con semilla) ─► inference (posterior λ, θ, η) ─► portfolio (D5) ─► Profile + PortfolioProposal ─► panel
+                 ▲ scenarios (mercado sintético calibrado con el catálogo)
+```
+- **Escenarios** (`backend/behaviorlab/scenarios/`): dos índices sintéticos (bolsa y bonos) con semilla, calibrados con el snapshot del catálogo de MyInvestor (`data/catalog/`) y cinco episodios de caída (`CALIBRACION.md`).
+- **Partida** (`game/`): vender todo / mantener / aportar; en las subidas de sueldo, qué parte se invierte.
+- **Perfil** (`inference/`): λ aversión a la pérdida, θ caída a la que vende, η parte del aumento que invierte, siempre con su intervalo creíble al 90 %.
+- **Cartera** (`portfolio/`): se simula la conducta estimada sobre cada cartera del catálogo; nivel final = mínimo de (lo revelado en la partida, la capacidad de asumir pérdidas, el horizonte). Lo declarado nunca sube el riesgo.
+- **API** (`backend/api/`, solo orquesta): ver [`backend/api/README.md`](backend/api/README.md).
+- **Frontend** (`frontend/`, React + Vite + TypeScript): ver [`frontend/README.md`](frontend/README.md).
+
+## Limitaciones conocidas
+- El modelo de inferencia es **provisional** (los perfiles llevan `provisional_model: true`).
+- Escenarios sintéticos: pueden infraestimar colas extremas. La Cartera Ahorro se simula como renta fija y su riesgo queda sobrestimado.
+- Rentabilidades del catálogo sin comisiones de gestión ni custodia. Rentabilidades pasadas no garantizan rentabilidades futuras.
+
+## Documentación
+`docs/SPEC.md` (producto y plan) · `docs/DECISIONS.md` (decisiones) · `docs/REQUIREMENTS.md` (requisitos) · `docs/CUESTIONARIO.md` (cuestionario de idoneidad) · `docs/ROLES.md` (equipo) · `docs/STATUS.md` (estado) · `CLAUDE.md` (reglas para Claude Code).
 
 ## Estructura
 ```
-contracts/              modelos compartidos entre módulos
+contracts/              modelos compartidos (pydantic)
 backend/behaviorlab/    núcleo: scenarios, game, inference, portfolio, validation, text
 backend/api/            FastAPI (solo orquesta)
 frontend/               juego + panel del banco
-data/                   catalog (snapshots), study (agregados), cache (textos)
+data/                   catalog (snapshots con fecha y fuente), study (protocolo, solo agregados)
 tests/                  unit, property, integration
 reports/                salida de validación
 pitch/                  PDF, presentación, guion
 docs/                   spec, roles, requisitos, decisiones, estado
 ```
-
-## Instalación, configuración, ejecución y tests
-Requisitos: **Python 3.12**, `make` y `git`. Todo se instala en `.venv/` dentro del repo (nada global).
-
-```bash
-git clone https://github.com/villanuevadrian/hack-finance.git
-cd hack-finance
-cp .env.example .env        # rellenad vuestra clave; .env nunca se sube
-make setup                  # crea .venv e instala dependencias
-make test                   # tests
-make lint                   # estilo (ruff)
-make run-api                # API en http://127.0.0.1:8000 (docs en /docs); carga .env si existe
-```
-
-Las versiones exactas de las dependencias están fijadas en `requirements-lock.txt` (las probadas con `make test`), así la entrega instala igual en cualquier máquina. Para añadir o cambiar una dependencia: editarla en `pyproject.toml`, `make setup`, `make test` y `make lock`.
-
-**Claude es opcional.** Solo lo usa Vega, la ayudante, para explicar cómo funciona el juego. Sin clave (o si la llamada falla) responde con preguntas frecuentes fijas y la demo funciona entera sin red. Para activarlo, poned `ANTHROPIC_API_KEY` en `.env` (nunca se sube) y un límite de gasto en la consola de Anthropic; `http://127.0.0.1:8000/config` indica `"assistant_uses_claude": true` cuando está activo.
-
-Si `python3.12` no está en el PATH: `make setup PYTHON=/ruta/a/python3.12`. En Windows, usad WSL.
-Pendientes: `make run-web` (tras D8) y `make validate` (lo implementa Datos).
-
-Endpoints de la API y flujo de una partida: [`backend/api/README.md`](backend/api/README.md). Con la API arrancada, la documentación interactiva está en http://127.0.0.1:8000/docs.
-
-> El modelo de inferencia actual es **provisional** (lo sustituye Datos): los perfiles llevan `provisional_model: true`.
 
 ## Equipo
 Ver `docs/ROLES.md`.
