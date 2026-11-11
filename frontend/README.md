@@ -55,7 +55,7 @@ y se guardan en `public/audio/` para que la demo no dependa de la red:
 ELEVENLABS_API_KEY=... ELEVENLABS_VOICE_ID=... npm run gen:voice
 ```
 
-Activa la voz con `VITE_ENABLE_VOICE=true` (en un `.env` que se suba al repo, no es un secreto). **Voz híbrida:** si falta el audio de una frase, la lee la voz del navegador, que también lee las respuestas del chat de Vega. Cada frase suena sola solo la primera vez que aparece; al volver atrás no se repite, y el botón 🔊 la reproduce cuando se quiera. Vega habla sola; en la partida la voz es solo bajo
+La voz está activada por defecto con `VITE_ENABLE_VOICE=true` en `frontend/.env.development` y `frontend/.env.production` (versionados, no son secretos; el `.gitignore` de la raíz ignora cualquier `.env`, por eso no sirve un `frontend/.env` para esto). En Vercel, la variable también puede ponerse en la configuración del proyecto. **Voz híbrida:** si falta el audio de una frase, la lee la voz del navegador, que también lee las respuestas del chat de Vega. Cada frase suena sola solo la primera vez que aparece; al volver atrás no se repite, y el botón 🔊 la reproduce cuando se quiera. Vega habla sola; en la partida la voz es solo bajo
 demanda (botón 🔊), porque una narración automática cambiaría el tiempo de decisión, que forma parte de la medición.
 Sin audios o sin la variable, todo funciona con subtítulos. El script no se ha podido probar contra ElevenLabs desde
 el entorno de desarrollo: pruébalo con una clave real antes de la demo.

@@ -31,7 +31,8 @@ Todo funciona sin configurar nada. Opcional, en un `.env` en la raíz (copiad `.
 | `ANTHROPIC_API_KEY` | Vega, la ayudante, responde con Claude. Sin clave (o si falla la red) responde con preguntas frecuentes fijas. `GET /config` indica `"assistant_uses_claude"` |
 | `BEHAVIORLAB_DECISION_TIMEOUT_MS` | Tiempo por decisión (por defecto 15 000) |
 | `BEHAVIORLAB_DATA_DIR` | Carpeta donde guardar las partidas para que sobrevivan a un reinicio (por defecto, solo en memoria). Debe quedar fuera de git |
-| `VITE_ENABLE_VOICE`, `VITE_API_URL` | En `frontend/.env` (ver `frontend/.env.example`): voz pregrabada (T2; sin ella, subtítulos) y dirección de la API (por defecto `http://localhost:8000`) |
+| `VITE_ENABLE_VOICE` | Voz de Vega con los audios pregrabados de `frontend/public/audio/` (T2). Activada por defecto en `frontend/.env.development` y `.env.production`; con `false`, solo subtítulos. El navegador no reproduce sonido hasta el primer clic en la página |
+| `VITE_API_URL` | Dirección de la API para el frontend (por defecto `http://localhost:8000`; `make run-web` la ajusta a `API_PORT`) |
 
 Claude **nunca** calcula cifras: todos los números salen de código determinista con tests.
 
