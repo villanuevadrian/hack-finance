@@ -44,16 +44,11 @@ from contracts import (
 app = FastAPI(title="BehaviorLab API", version="0.1.0")
 app.add_middleware(
     CORSMiddleware,
-    # Local origins plus the deployed frontend, e.g. BEHAVIORLAB_CORS_ORIGINS=https://x.vercel.app
+    # Any local port (the frontend port is configurable) plus the deployed frontend,
+    # e.g. BEHAVIORLAB_CORS_ORIGINS=https://x.vercel.app
+    allow_origin_regex=r"http://(localhost|127\.0\.0\.1)(:\d+)?",
     allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:8501",
-        *[
-            o.strip()
-            for o in os.environ.get("BEHAVIORLAB_CORS_ORIGINS", "").split(",")
-            if o.strip()
-        ],
+        o.strip() for o in os.environ.get("BEHAVIORLAB_CORS_ORIGINS", "").split(",") if o.strip()
     ],
     allow_methods=["*"],
     allow_headers=["*"],

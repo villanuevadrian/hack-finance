@@ -13,4 +13,4 @@ FastAPI. Solo orquesta, no calcula. Dueño: Informática 1. Partidas en memoria 
 | GET | `/games/{id}/proposal` | `PortfolioProposal` (409 hasta terminar) |
 | GET | `/games/{id}/posterior` | `Posterior` con marginales para gráficos (409 hasta terminar) |
 
-Documentación interactiva con los esquemas: `make run-api` y abrir http://127.0.0.1:8000/docs. CORS abierto para Vite (5173) y Streamlit (8501).
+Documentación interactiva con los esquemas: `make run-api` y abrir http://127.0.0.1:8000/docs. CORS abierto para cualquier puerto de `localhost` (el frontend usa el 5280 por defecto) y para los orígenes de `BEHAVIORLAB_CORS_ORIGINS`.

@@ -10,10 +10,10 @@ Requisitos: **Python 3.12**, **Node.js ≥ 20.19**, `make` y `git`. Todo se inst
 ```bash
 make setup && make setup-web     # instala backend y frontend con versiones fijadas
 make run-api                     # terminal 1: API en http://127.0.0.1:8000 (docs en /docs)
-make run-web                     # terminal 2: juego y panel del banco en http://localhost:5173
+make run-web                     # terminal 2: juego y panel del banco en http://localhost:5280
 ```
 
-Abrid http://localhost:5173, cread vuestro "yo inversor", jugad las 15 rondas y al final veréis el perfil, la cartera propuesta, el informe de idoneidad, la "revelación" (el mismo mercado jugado con otras decisiones) y el panel del banco.
+Abrid http://localhost:5280, cread vuestro "yo inversor", jugad las 15 rondas y al final veréis el perfil, la cartera propuesta, el informe de idoneidad, la "revelación" (el mismo mercado jugado con otras decisiones) y el panel del banco.
 
 ## Tests
 ```bash
@@ -34,6 +34,8 @@ Todo funciona sin configurar nada. Opcional, en un `.env` en la raíz (copiad `.
 | `VITE_ENABLE_VOICE`, `VITE_API_URL` | En `frontend/.env` (ver `frontend/.env.example`): voz pregrabada (T2; sin ella, subtítulos) y dirección de la API (por defecto `http://localhost:8000`) |
 
 Claude **nunca** calcula cifras: todos los números salen de código determinista con tests.
+
+Puertos por defecto: API 8000 y web 5280. Si alguno está ocupado: `make run-api API_PORT=8010` y `make run-web WEB_PORT=5290 API_PORT=8010`.
 
 Si `python3.12` no está en el PATH: `make setup PYTHON=/ruta/a/python3.12`. En Windows, usad WSL. Las versiones exactas del backend están en `requirements-lock.txt` (`make lock` para regenerarlo) y las del frontend en `frontend/package-lock.json`.
 

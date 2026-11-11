@@ -8,7 +8,7 @@ calcula ninguna propuesta ni ningún nivel.
 
 ```bash
 make setup && make run-api          # backend en http://localhost:8000
-cd frontend && npm install && npm run dev   # http://localhost:5173 (puerto permitido por CORS en la API)
+make setup-web && make run-web             # http://localhost:5280 (CORS de la API acepta cualquier puerto local)
 ```
 
 | Comando | Qué hace |
