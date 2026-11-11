@@ -1,16 +1,16 @@
 # Informe de validación
 
 Generado por `make validate` (`scripts/validate.py`). Todo con semilla: el mismo código da el mismo informe.
-**Validación de respaldo escrita por Núcleo** sobre el modelo de inferencia provisional; la sustituye la de Datos si llega. Jugadores **simulados** sobre el motor real (no hay usuarios reales todavía).
+Estimación con el **modelo robusto de Datos** (`inference/model.py`, el que usa la API). Jugadores **simulados** sobre el motor real (no hay usuarios reales todavía). La validación V1 completa de Datos, con varios tipos de jugador, está en `reports/v1_model_k15.txt`.
 
 ## V1 · Recuperación de parámetros (300 jugadores simulados)
 Parámetros verdaderos al azar en el rango de la rejilla; cada acción se elige con el modelo de elección. Un intervalo creíble del 90 % bien calibrado debe contener el valor verdadero en torno al 90 % de las veces.
 
 | Parámetro | Error medio absoluto | Cobertura del IC 90 % | Anchura media del IC |
 |---|---|---|---|
-| λ aversión a la pérdida | 0.537 | 94 % | 2.163 |
-| θ caída a la que vende | 0.043 | 91 % | 0.170 |
-| η parte de la subida que invierte | 0.088 | 87 % | 0.358 |
+| λ aversión a la pérdida | 0.553 | 95 % | 2.267 |
+| θ caída a la que vende | 0.045 | 93 % | 0.189 |
+| η parte de la subida que invierte | 0.089 | 91 % | 0.393 |
 
 Lectura: θ y η se recuperan con precisión útil. **λ apenas se identifica** con 15 rondas: su intervalo cubre casi todo el rango, así que el panel lo muestra con su incertidumbre y la recomendación no lo usa.
 
@@ -22,7 +22,7 @@ No los genera el modelo: venden todo cuando la caída llega a un umbral y, si no
 | 5 % | 20/20 | 0.05 |
 | 10 % | 20/20 | 0.07 |
 | 15 % | 19/20 | 0.12 |
-| 20 % | 13/20 | 0.21 |
+| 20 % | 13/20 | 0.22 |
 | 30 % | 11/20 | 0.29 |
 
 Si el mercado no llega al umbral, el jugador no vende y solo sabemos que aguanta más de lo que vio: θ queda censurado y la fiabilidad del perfil baja.

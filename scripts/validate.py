@@ -70,8 +70,9 @@ def main() -> int:
         "# Informe de validación",
         "",
         "Generado por `make validate` (`scripts/validate.py`). Todo con semilla: el mismo código da el mismo informe.",
-        "**Validación de respaldo escrita por Núcleo** sobre el modelo de inferencia provisional; "
-        "la sustituye la de Datos si llega. Jugadores **simulados** sobre el motor real (no hay usuarios reales todavía).",
+        "Estimación con el **modelo robusto de Datos** (`inference/model.py`, el que usa la API). "
+        "Jugadores **simulados** sobre el motor real (no hay usuarios reales todavía). "
+        "La validación V1 completa de Datos, con varios tipos de jugador, está en `reports/v1_model_k15.txt`.",
         "",
         f"## V1 · Recuperación de parámetros ({N_V1} jugadores simulados)",
         "Parámetros verdaderos al azar en el rango de la rejilla; cada acción se elige con el modelo de elección. "
