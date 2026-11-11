@@ -801,6 +801,16 @@ a.mode:hover { color: var(--ink); border-color: var(--muted); }
 .modal-backdrop { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 20px; background: rgb(5 3 16 / 0.7); backdrop-filter: blur(5px); animation: card-in 200ms ease-out; }
 .modal { width: min(620px, 100%); padding: 24px; display: grid; gap: 14px; border: 2px solid var(--gold); }
 .modal h2 { font-size: 1.6rem; }
+/* On a phone the dialog is taller than the screen: it scrolls itself and the page behind stays still. */
+.modal { max-height: calc(100vh - 40px); max-height: calc(100dvh - 40px); overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.modal-backdrop { overscroll-behavior: contain; touch-action: none; }
+.modal-backdrop .modal { touch-action: pan-y; }
+html:has(.modal-backdrop), body:has(.modal-backdrop) { overflow: hidden; }
+@media (max-width: 600px) {
+  .modal-backdrop { padding: 10px; }
+  .modal { max-height: calc(100vh - 20px); max-height: calc(100dvh - 20px); padding: 18px; gap: 12px; }
+  .modal h2 { font-size: 1.3rem; }
+}
 @media (max-width: 900px) {
   .hero { grid-template-columns: 1fr; min-height: 0; }
   .hero-art { max-width: 460px; justify-self: center; width: 100%; }

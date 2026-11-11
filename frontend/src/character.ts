@@ -19,8 +19,8 @@ export interface Avatar {
  */
 export type Gear = 'cape' | 'pauldrons' | 'shield' | 'boots' | 'banner'
 export const GEAR_BY_BLOCK: Record<string, { gear: Gear; name: string }> = {
-  who: { gear: 'cape', name: 'Capa de aventurera' },
-  inventory: { gear: 'pauldrons', name: 'Hombreras de exploradora' },
+  who: { gear: 'cape', name: 'Capa de aventura' },
+  inventory: { gear: 'pauldrons', name: 'Hombreras de exploración' },
   quiz: { gear: 'shield', name: 'Escudo del saber' },
   base: { gear: 'boots', name: 'Botas de campamento' },
   mission: { gear: 'banner', name: 'Estandarte de tu misión' },
