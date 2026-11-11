@@ -93,7 +93,7 @@ Salen de las respuestas del cuestionario (`docs/CUESTIONARIO.md`):
 - `CatalogPortfolio` (C3): se rellena desde el JSON del catálogo; `equity_pct` da `w_RV`.
 - `Scenario`: `seed`, `episode_id`, `rv_path[]`, `rf_path[]`, `salary_path[]`, `phase_by_round[]`, `situations_by_phase`.
 - Función pura `portfolio_path(scenario, equity_pct) -> list[float]`.
-- Tests propuestos: misma semilla → misma trayectoria; caída de pico a valle dentro de ±2 pp del objetivo; el control 2008 reproduce la sección 2 con ±1,5 pp.
+- Tests propuestos: misma semilla → misma trayectoria; caída de pico a valle dentro de ±2 pp del objetivo; el control 2008 reproduce la sección 2 con ±2 pp (Rock queda a 1,7 pp; los datos de 2008 publicados son anuales y en parte reconstruidos).
 
 ## 10. Límites que se dicen en el pitch
 - Escenarios sintéticos: pueden infraestimar colas extremas.

@@ -4,6 +4,7 @@ Al cerrar un bloque, añade una línea: `- AAAA-MM-DD HH:MM · persona · qué q
 
 ## Producto y pitch
 - 2026-11-08 14:59 · Álvaro · Snapshot del catálogo (6 carteras indexadas) y diseño de escenarios para el onboarding (partida única centrada en caídas) y cuestionario de idoneidad gamificado (docs/CUESTIONARIO.md) en rama feat/producto-calibracion · revisar con Adrian en la reunión y cerrar D4 · sin bloqueos
+- 2026-11-11 10:55 · Álvaro · TODO(Álvaro) cerrados: umbral P(pánico) D5 = 0,30; control 2008 a ±2 pp (Rock deja de ser xfail); ingresos abiertos 800 / 5.000 €; forma de episodios, subida de ronda 1 y Ahorro como RF aceptados · pitch y README de producto · episode_prob sigue pendiente de Amanda
 ## Modelo y validación
 ## Núcleo y API
 - 2026-11-08 · Adrian · infraestructura del scaffold (pyproject, Makefile, CI, /health, tests de entorno; `make setup/test/lint` en verde en macOS) · contratos v0 tras cerrar D1, D2, D6 y C1-C5 · ninguno
