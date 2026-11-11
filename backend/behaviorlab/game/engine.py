@@ -40,8 +40,9 @@ from contracts import (
 )
 
 CONTRIBUTION_SHARE = 0.10  # D2: "aportar el 10 % del sueldo"
-# CALIBRACION.md §8, rule 4. Configurable (BEHAVIORLAB_DECISION_TIMEOUT_MS); default 15 s.
-DEFAULT_TIMEOUT_MS = int(os.environ.get("BEHAVIORLAB_DECISION_TIMEOUT_MS", "15000"))
+# CALIBRACION.md §8, rule 4. Configurable (BEHAVIORLAB_DECISION_TIMEOUT_MS).
+# Default 30 s (team, 11-nov: 15 s was too short to read the round).
+DEFAULT_TIMEOUT_MS = int(os.environ.get("BEHAVIORLAB_DECISION_TIMEOUT_MS", "30000"))
 # Accepted by Producto (11-nov): below this portfolio drop the chosen episode teaches
 # little about theta and
 # `inflacion` (equity and bonds fall together) is used instead (CALIBRACION.md §4).
@@ -58,9 +59,15 @@ class GameError(ValueError):
     """Invalid move (finished game, unavailable action, missing onboarding data)."""
 
 
+# Lowest level played in the game. Level 0 (money market) does not fall, so a game with it
+# would measure nothing; those players play level 1 and their final level stays capped at 0
+# by capacity or horizon anyway.
+MIN_PLAYED_LEVEL = 1
+
+
 def simulated_portfolio_level(answers: OnboardingAnswers) -> int:
-    """Portfolio played in the game: level min(capacity, horizon) (CALIBRACION.md §7)."""
-    return min(capacity_level(answers), horizon_level(answers))
+    """Portfolio played: max(1, min(capacity, horizon)) (CALIBRACION.md §7, level >= 1)."""
+    return max(MIN_PLAYED_LEVEL, min(capacity_level(answers), horizon_level(answers)))
 
 
 def choose_episode(seed: int, equity_weight: float) -> Episode:

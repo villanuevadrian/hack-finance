@@ -3,9 +3,9 @@ import { formatEur } from './format'
 
 /**
  * CALIBRACION.md §8, rule 4: time per decision; the engine counts no decision as "do nothing".
- * Default 15 s; the real value comes from the server (GET /config) so frontend and engine always agree.
+ * Default 30 s; the real value comes from the server (GET /config) so frontend and engine always agree.
  */
-export const DECISION_TIMEOUT_MS = 15_000
+export const DECISION_TIMEOUT_MS = 30_000
 
 /**
  * Wealth path shown in the game: starting capital, then the wealth the player had when deciding each

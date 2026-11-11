@@ -5,7 +5,12 @@ from collections.abc import Callable
 import pytest
 
 from behaviorlab.game import GameError, apply_decision, new_game
-from behaviorlab.game.engine import CONTRIBUTION_SHARE, choose_episode
+from behaviorlab.game.engine import (
+    CONTRIBUTION_SHARE,
+    DEFAULT_TIMEOUT_MS,
+    choose_episode,
+    simulated_portfolio_level,
+)
 from contracts import (
     Action,
     Catalog,
@@ -139,7 +144,7 @@ def test_raise_updates_salary_and_auto_investment(
 
 def test_timeout_counts_as_doing_nothing(answers: OnboardingAnswers, catalog: Catalog) -> None:
     scenario, state = new_game("g", answers, catalog, 4)
-    nxt = apply_decision(state, scenario, Action.SELL_ALL, 20_000)
+    nxt = apply_decision(state, scenario, Action.SELL_ALL, DEFAULT_TIMEOUT_MS + 1)
     assert nxt.history[-1].action == Action.HOLD and nxt.history[-1].timed_out
     nxt = apply_decision(nxt, scenario, None, 1_000)
     assert nxt.history[-1].timed_out
@@ -164,3 +169,16 @@ def test_missing_onboarding_data(
 def test_conservative_portfolios_get_an_informative_episode() -> None:
     for seed in range(30):
         assert choose_episode(seed, 0.13) == Episode.INFLACION
+
+
+def test_timeout_is_30_seconds_by_default() -> None:
+    assert DEFAULT_TIMEOUT_MS == 30_000
+
+
+def test_level_zero_players_play_a_portfolio_that_moves(
+    make_answers: Callable[..., OnboardingAnswers], catalog: Catalog
+) -> None:
+    answers = make_answers(goal="emergency_fund")  # horizon level 0
+    assert simulated_portfolio_level(answers) == 1
+    _, state = new_game("g", answers, catalog, 1)
+    assert state.portfolio_id == "clasica"

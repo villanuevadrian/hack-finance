@@ -85,7 +85,7 @@ Salen de las respuestas del cuestionario (`docs/CUESTIONARIO.md`):
 1. Euros, no porcentajes; la pérdida también en **meses de sueldo**.
 2. Sin puntuación ni ranking durante la partida.
 3. Botones neutros y en orden aleatorio cada ronda.
-4. 15 s por decisión; si no decide, cuenta como "mantener" y se registra el tiempo.
+4. 30 s por decisión (el equipo lo subió de 15 s el 11-nov: no daba tiempo a leer la ronda); si no decide, cuenta como "mantener" y se registra el tiempo.
 5. Episodios sin nombre ni fecha: no se puede reconocer "2008" y saber que acaba bien.
 6. Una situación de control repetida con distinto envoltorio; la discrepancia alimenta la métrica de coherencia.
 
