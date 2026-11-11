@@ -39,7 +39,7 @@ class Posterior(BaseModel):
     summary: list[ParameterEstimate]
     n_decisions: int = Field(ge=0)
     provisional: bool = Field(
-        default=False, description="True while the model is the provisional one (Datos)"
+        default=False, description="True only if a non-production model produced it"
     )
 
     @model_validator(mode="after")

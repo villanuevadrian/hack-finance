@@ -2,7 +2,7 @@
 
 Diseño: Producto (Álvaro). Implementación y dueño de la carpeta: Núcleo (Adrian).
 Datos: `data/catalog/myinvestor_carteras_2026-11-08.json`.
-Estado: **propuesta para la reunión del domingo**. Alineada con `docs/DUDAS.md` (D2-B, D3, C1, C3) y con `docs/CUESTIONARIO.md` (D6). Ningún número lo calcula un LLM.
+Estado: **aceptada e implementada** (`calibration.py`, `generator.py`). Alineada con `docs/DUDAS.md` (D2-B, D3, C1, C3) y con `docs/CUESTIONARIO.md` (D6). Ningún número lo calcula un LLM.
 
 ## 0. Para qué es la partida
 BehaviorLab se vende al banco (cliente de la demo: MyInvestor) como parte de su **onboarding**: el test de idoneidad y la partida forman un solo recorrido gamificado (ver `docs/CUESTIONARIO.md`). La partida dura unos 4 minutos y se juega una vez. El objetivo es quitar barrera de entrada y que la cartera propuesta sea una que el cliente aguante de verdad.

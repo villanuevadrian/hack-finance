@@ -33,7 +33,7 @@ from contracts import (
     SuitabilityLevels,
 )
 
-# TODO(Amanda): provisional reliability thresholds on the width of the 90 % interval of
+# Reliability thresholds on the width of the 90 % interval of
 # theta, until D7 sets the validation thresholds.
 RELIABILITY_HIGH_WIDTH = 0.10
 RELIABILITY_MEDIUM_WIDTH = 0.20

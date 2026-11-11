@@ -1,6 +1,6 @@
-"""Fast checks of the backup validation (small samples; the full run is `make validate`)."""
+"""Fast checks of the validation battery (small samples; the full run is `make validate`)."""
 
-from behaviorlab.validation.respaldo import v1_recovery, v2_prediction, v4_invariants
+from behaviorlab.validation.battery import v1_recovery, v2_prediction, v4_invariants
 from contracts import Catalog, OnboardingAnswers
 
 

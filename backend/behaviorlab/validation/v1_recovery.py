@@ -120,14 +120,14 @@ def format_rows(rows: list[Row]) -> str:
 
 
 def main() -> None:  # pragma: no cover - manual baseline run
-    """Usage: python -m behaviorlab.validation.v1_recovery [provisional|model] [n] [k,k,...]"""
+    """Usage: python -m behaviorlab.validation.v1_recovery [reference|model] [n] [k,k,...]"""
     import sys
 
-    from behaviorlab.inference import model, provisional
+    from behaviorlab.inference import model, reference
     from behaviorlab.validation.fixtures import base_answers, load_catalog
 
-    estimators = {"provisional": provisional.estimate_posterior, "model": model.estimate_posterior}
-    which = sys.argv[1] if len(sys.argv) > 1 else "provisional"
+    estimators = {"reference": reference.estimate_posterior, "model": model.estimate_posterior}
+    which = sys.argv[1] if len(sys.argv) > 1 else "reference"
     n = int(sys.argv[2]) if len(sys.argv) > 2 else 200
     ks = tuple(int(x) for x in sys.argv[3].split(",")) if len(sys.argv) > 3 else KS
     all_rows: list[Row] = []

@@ -11,7 +11,7 @@ type Source = 'api' | 'local'
 /**
  * Bank side: list of games with their result, aggregated indicators and access to each client's panel.
  * Uses GET /games when the backend has it; otherwise the games started in this browser (one-laptop demo).
- * DEMO ACCESS: there is no authentication yet. TODO(Núcleo): a real entity login before any real use.
+ * DEMO ACCESS: there is no authentication yet. Next step: a real entity login before any real use.
  */
 export function BankPortal({ onOpen, onExit }: { onOpen: (gameId: string) => void; onExit: () => void }) {
   const [entered, setEntered] = useState(false)

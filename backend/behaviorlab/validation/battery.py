@@ -1,6 +1,5 @@
-"""BACKUP validation (V1, V2, V4) written by Núcleo in case Datos cannot deliver in time.
-
-TODO(Amanda): owner is Datos. If your validation lands, this file is discarded.
+"""Validation battery (V1, V1b, V2, V4) of the team; complements the V1 of Datos
+(`v1_recovery.py`, several kinds of simulated player).
 Everything is seeded and uses the real engine (new_game + apply_decision) and the current
 inference (`behaviorlab.inference`). No disk access: the report is written by scripts/validate.py.
 
@@ -35,7 +34,7 @@ import numpy as np
 
 from behaviorlab.game import apply_decision, new_game
 from behaviorlab.inference import estimate_posterior
-from behaviorlab.inference.provisional import (
+from behaviorlab.inference.reference import (
     ETA_GRID,
     LAMBDA_GRID,
     THETA_GRID,

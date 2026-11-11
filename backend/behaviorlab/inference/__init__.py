@@ -1,6 +1,6 @@
-"""Inference (Datos). The API uses the robust model of `model.py` (noise and lapse marginalised).
+"""Inference (Datos). The API uses the robust model of `model.py` (noise and lapses marginalised).
 
-`provisional.py` is kept as the reference model used by the backup validation.
+`reference.py` is the first model with fixed noise, kept as the reference of the validation.
 """
 
 from behaviorlab.inference.model import estimate_posterior

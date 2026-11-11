@@ -244,7 +244,7 @@ export interface Flag {
 
 /**
  * Atypical combinations to review while collecting the answers (CNMV Guía Técnica 2/2022, annex examples).
- * The player confirms or corrects them. TODO(Núcleo): the contract has no field to record the confirmation;
+ * The player confirms or corrects them. Next step: the contract has no field to record the confirmation;
  * today it only lives in the frontend and in the printed report.
  */
 export function consistencyFlags(d: Draft): Flag[] {

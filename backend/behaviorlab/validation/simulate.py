@@ -9,8 +9,8 @@ independent of `inference/`: when the inference model changes, the generators mu
 (otherwise the validation would grade the model against itself).
 
 Generators (all softmax over action utilities, utilities as in the docstring of
-`inference/provisional.py` unless stated; d = drawdown, f = raise share):
-  matched : same formulas and constants as the provisional model (well specified).
+`inference/reference.py` unless stated; d = drawdown, f = raise share):
+  matched : same formulas and constants as the reference model (well specified).
   noisy   : all noise scales x 2 (players less consistent than assumed).
   sharp   : all noise scales x 0.5 (players more consistent than assumed).
   lapse   : matched, but with probability 0.15 the player picks a uniformly random action

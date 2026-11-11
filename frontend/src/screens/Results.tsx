@@ -243,7 +243,6 @@ function Observed({ profile, posterior }: { profile: Profile; posterior: Posteri
       <div className="sheet">
         <section className="panel sheet-block">
           <h3>En la partida</h3>
-          {profile.provisional_model && <p className="example small">Modelo provisional: los resultados cambiarán cuando Datos conecte el modelo definitivo.</p>}
           {profile.parameters.map((p) => {
             const ui = PARAM_UI[p.name] ?? { name: p.name, format: (x: number) => x.toFixed(2) }
             return (
@@ -319,7 +318,7 @@ function Report({ sheet, world, results }: { sheet: InvestorSheet; world: World;
       <p>El resultado está limitado por {limitingText(profile.levels.limiting)}.</p>
 
       <h3>3. Tolerancia revelada frente a declarada</h3>
-      <p className="small">Mundo de la partida: {world.name}. {profile.provisional_model ? 'Modelo de inferencia provisional.' : ''} Fiabilidad: {profile.reliability}.</p>
+      <p className="small">Mundo de la partida: {world.name}. Fiabilidad: {profile.reliability}.</p>
       <table><tbody>
         {profile.parameters.map((p) => {
           const ui = PARAM_UI[p.name] ?? { name: p.name, format: (x: number) => x.toFixed(2) }

@@ -159,6 +159,6 @@ def test_uninformative_parameter_is_labelled() -> None:
     assert UNINFORMATIVE_NOTE not in eta.description
 
 
-def test_model_stays_provisional_until_validated() -> None:
-    assert model.PROVISIONAL is True
-    assert estimate_posterior([]).provisional is True
+def test_model_is_the_production_model() -> None:
+    assert model.PROVISIONAL is False
+    assert estimate_posterior([]).provisional is False

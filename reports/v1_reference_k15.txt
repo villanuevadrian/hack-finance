@@ -1,4 +1,4 @@
-﻿# estimator: provisional, players per generator: 200
+﻿# estimator: reference, players per generator: 200
 gen      param     k    bias    MAE  cov90  width  skill
 matched  lambda   15   0.047  0.564   0.93  2.154   0.11
 matched  theta    15   0.009  0.038   0.89  0.167   0.60

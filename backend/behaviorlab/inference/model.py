@@ -1,7 +1,7 @@
-"""Robust choice model and grid posterior (Datos). Candidate replacement of `provisional.py`.
+"""Robust choice model and grid posterior (Datos). Production model used by the API.
 
-Same three behavioural parameters and the same action utilities as the provisional model
-(D1/D2), but the two quantities the provisional model fixed by hand are now person-level
+Same three behavioural parameters and the same action utilities as the reference model
+(D1/D2), but the two quantities the reference model fixed by hand are now person-level
 NUISANCE parameters that are marginalised, so the credible intervals reflect that real players
 are noisier and less consistent than a fixed softmax assumes.
 
@@ -74,7 +74,7 @@ DESCRIPTIONS = {
 UNINFORMATIVE_NOTE = " [poco informativo con las decisiones de esta partida]"
 
 # Flipped to False only when V1 and V2 pass (see reports/validation.md).
-PROVISIONAL = True
+PROVISIONAL = False
 
 
 def _utilities(

@@ -1,4 +1,4 @@
-/** Product name shown in the interface: the provisional name of README.md. TODO(Producto): final name. */
+/** Product name shown in the interface (D9). */
 export const APP_NAME = 'BehaviorLab'
 /** Entity of the demo (D14: first target and demo client). The catalog comes from its dated snapshot. */
 export const ENTITY_NAME = 'MyInvestor (demo)'

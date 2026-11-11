@@ -536,7 +536,7 @@ export interface components {
             n_decisions: number;
             /**
              * Provisional
-             * @description True while the model is the provisional one (Datos)
+             * @description True only if a non-production model produced it
              * @default false
              */
             provisional: boolean;

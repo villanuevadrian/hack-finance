@@ -46,7 +46,6 @@ export function BankPanel({ game, results, onBack }: { game: GameState; results:
 
       <section className="panel bp-block">
         <h2>2. Perfil con incertidumbre</h2>
-        {profile.provisional_model && <p className="example small">Modelo provisional de inferencia.</p>}
         <div className="bp-marginals">
           {profile.parameters.map((p) => {
             const ui = PARAM_UI[p.name] ?? { name: p.name, format: (x: number) => x.toFixed(2) }

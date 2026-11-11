@@ -1,10 +1,10 @@
-"""Checks of the PROVISIONAL inference (Datos will replace the model)."""
+"""Checks of the reference inference model (fixed noise)."""
 
 import numpy as np
 import pytest
 
 from behaviorlab.inference import estimate_posterior
-from behaviorlab.inference.provisional import (
+from behaviorlab.inference.reference import (
     ETA_GRID,
     LAMBDA_GRID,
     THETA_GRID,
@@ -60,7 +60,7 @@ def test_marginals_sum_to_one_and_intervals_contain_mean() -> None:
     for name, w in post.marginals.items():
         assert sum(w) == pytest.approx(1)
         assert len(w) == len(post.grid[name])
-    assert post.provisional
+    assert not post.provisional
 
 
 def test_no_data_gives_uniform_posterior() -> None:

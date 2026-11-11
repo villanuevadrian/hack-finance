@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-from behaviorlab.validation.respaldo import (  # noqa: E402
+from behaviorlab.validation.battery import (  # noqa: E402
     STATED_BIAS,
     STATED_NOISE,
     v1_recovery,

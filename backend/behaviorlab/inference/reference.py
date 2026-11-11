@@ -1,8 +1,8 @@
-"""PROVISIONAL choice model and grid posterior, written by Núcleo to unblock the demo.
+"""Reference choice model and grid posterior with FIXED decision noise (first version).
 
-TODO(Amanda): this module belongs to Datos. Replace it with the real model; keep the
-signature `estimate_posterior(decisions) -> Posterior` (or tell Núcleo) so the API and
-`portfolio/` keep working. Every Posterior produced here carries `provisional=True`.
+The API uses the robust model of `model.py` (Datos), which marginalises the noise and lapses.
+This module is kept as the reference: it generates the simulated players of the validation
+and is the baseline the robust model is compared with (reports/v1_reference_k15.txt).
 
 Choice model: softmax over action utilities with fixed noise (D1: tau fixed in T0).
 Let d be the portfolio drawdown the player saw (0.2 = -20 %), and f the raise share.
@@ -127,5 +127,5 @@ def estimate_posterior(decisions: list[Decision]) -> Posterior:
         marginals={k: [float(x) for x in v] for k, v in marginals.items()},
         summary=[_summary(k, grids[k], marginals[k]) for k in ("lambda", "theta", "eta")],
         n_decisions=sum(1 for d in decisions if not d.timed_out),
-        provisional=True,
+        provisional=False,
     )

@@ -104,6 +104,6 @@ disponible y vista 2D automática sin WebGL.
 
 ## Pendiente (conocido)
 
-- `TODO(Núcleo)`: el contrato no guarda la confirmación de las respuestas atípicas ni el avatar; hoy viven en el
+- Siguiente paso: el contrato no guarda la confirmación de las respuestas atípicas ni el avatar; hoy viven en el
   frontend y en el informe impreso. Añadirlo exige cambiar `contracts/` con el acuerdo del equipo.
 - La voz de las respuestas del chat usa la voz del navegador (no se pueden pregenerar).
