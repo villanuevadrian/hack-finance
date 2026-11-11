@@ -63,7 +63,7 @@ cuestionario ─► game (15 rondas con semilla) ─► inference (posterior λ,
 - **Frontend** (`frontend/`, React + Vite + TypeScript): ver [`frontend/README.md`](frontend/README.md).
 
 ## Limitaciones conocidas
-- El modelo de inferencia es **provisional** (los perfiles llevan `provisional_model: true`).
+- El modelo de inferencia está validado con jugadores simulados (`reports/`); la validación con usuarios reales es el siguiente paso.
 - Escenarios sintéticos: pueden infraestimar colas extremas. La Cartera Ahorro se simula como renta fija y su riesgo queda sobrestimado.
 - Rentabilidades del catálogo sin comisiones de gestión ni custodia. Rentabilidades pasadas no garantizan rentabilidades futuras.
 

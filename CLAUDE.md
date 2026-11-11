@@ -1,6 +1,6 @@
 # CLAUDE.md — BehaviorLab (Hack Finance)
 
-> Nombre provisional. Léelo entero antes de tocar código. El detalle de producto, plan y reparto está en `docs/SPEC.md`.
+> Léelo entero antes de tocar código. El detalle de producto, plan y reparto está en `docs/SPEC.md`.
 
 ## Qué es
 Producto B2B (cliente ficticio de la demo: MyInvestor). Un juego corto mide cómo reaccionan jóvenes inversores ante caídas de mercado y subidas de sueldo. Se estima un **perfil conductual con incertidumbre** y se propone la cartera del catálogo que esa persona sea capaz de mantener. Complementa al test de idoneidad; no lo sustituye.
@@ -40,10 +40,10 @@ tests/  docs/
 ```
 Flujo: `scenarios → game → inference (posterior) → portfolio → Profile + PortfolioProposal → panel`.
 
-## Stack (a confirmar el domingo)
-Python 3.12, numpy/scipy, pydantic, FastAPI, pytest + hypothesis, ruff. Frontend: Vite + React + TypeScript + Plotly/ECharts. Plan B si el frontend no está listo el lunes por la noche: Streamlit.
+## Stack
+Python 3.12, numpy/scipy, pydantic, FastAPI, pytest + hypothesis, ruff. Frontend: Vite + React + TypeScript + Three.js (React Three Fiber). Persistencia: PostgreSQL (`DATABASE_URL`), carpeta o memoria.
 
-## Comandos (el scaffold debe crearlos con Makefile)
+## Comandos (Makefile)
 `make setup` · `make test` · `make lint` · `make run-api` · `make run-web` · `make validate` (corre la batería de validación y escribe `reports/validation.md`).
 
 ## Convenciones

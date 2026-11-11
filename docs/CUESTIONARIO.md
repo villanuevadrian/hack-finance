@@ -1,8 +1,8 @@
 # Cuestionario de idoneidad gamificado
 
-Dueño: Producto (Álvaro). Estado: **propuesta para la reunión del domingo**.
+Dueño: Producto (Álvaro). Estado: **aceptado e implementado** (`frontend/src/questionnaire.ts`, `backend/behaviorlab/game/onboarding.py`).
 Base: documento de brainstorming del equipo (preguntas de conveniencia e idoneidad de la CNMV) y `backend/behaviorlab/scenarios/CALIBRACION.md`.
-Fuentes legales de referencia, **pendientes de verificar en la revisión normativa (P4)**: MiFID II art. 25.2 y 25.3; Reglamento Delegado (UE) 2017/565 arts. 54-56; Directrices de ESMA sobre idoneidad (2022); CNMV Guía Técnica 2/2022 sobre evaluación de la conveniencia.
+Fuentes legales de referencia (detalle en `pitch/FUENTES.md`): MiFID II art. 25.2 y 25.3; Reglamento Delegado (UE) 2017/565 arts. 54-56; Directrices de ESMA sobre idoneidad (2022); CNMV Guía Técnica 2/2022 sobre evaluación de la conveniencia.
 
 ## 1. Enfoque
 - El onboarding es **un solo recorrido**: preguntas cerradas integradas en la narrativa + la partida de caídas.
@@ -126,7 +126,7 @@ El informe de idoneidad (lo que recibe el banco y el cliente) incluye:
 - Cartera propuesta y por qué es idónea (riesgo, horizonte, capacidad).
 - Avisos legales y fecha recomendada de revisión del perfil (la información debe mantenerse actualizada).
 
-## 9. Pendiente
+## 9. Siguientes pasos
 - Validar textos y fuentes en la revisión normativa (P4).
 - Acordar con Datos cómo se traduce el posterior en el nivel revelado (umbrales).
 - Acordar con Núcleo si las respuestas van en un nuevo contrato (`OnboardingAnswers`) sin tocar `contracts/` hasta la reunión.

@@ -1,6 +1,6 @@
 # SPEC — BehaviorLab
 
-Estado: borrador del domingo 8-nov-2026. Todo lo marcado **(decidir)** se cierra antes del domingo por la noche. Fuente de verdad: este archivo en el repo.
+Estado: versión final (11-nov-2026). Las decisiones cerradas están en `docs/DECISIONS.md`. Fuente de verdad: este archivo en el repo.
 
 ## 1. Premisa
 Los bancos obtienen el perfil de riesgo del cliente joven con un cuestionario declarativo. Lo que la gente dice que hará y lo que hace cuando el mercado cae no coinciden. BehaviorLab mide la conducta en un juego corto, estima parámetros con su incertidumbre y elige, entre las carteras del catálogo, la que esa persona sea capaz de mantener. El cliente de la demo es MyInvestor.
@@ -30,26 +30,26 @@ Hipótesis a defender, no hechos: (a) el juego aporta información que el test n
 
 **Fuera de alcance:** fiscalidad, acciones sueltas, derivados, asesoramiento regulado, detección de emociones por voz.
 
-## 3. Decisiones por cerrar hoy
+## 3. Decisiones
 Resumen. La fuente de verdad de las decisiones es `docs/DECISIONS.md`; las dudas abiertas, con recomendaciones, están en `docs/DUDAS.md`.
 
 | ID | Decisión | Propuesta | Estado |
 |---|---|---|---|
-| D1 | Variables a medir | λ (aversión a la pérdida), θ (caída a la que se vende), η (fracción del aumento de sueldo que se invierte) | decidir |
-| D2 | Acciones por ronda | vender todo / mantener / aportar el 10% del sueldo | decidir |
-| D3 | Rondas por partida | 12 a 16 (≈ 5 min) | decidir |
-| D4 | Escenarios | Sintéticos calibrados con volatilidad y caídas del catálogo; sin nombre | decidir |
-| D5 | Criterio de cartera | Maximizar el percentil 10 de riqueza final sujeto a P(venta en pánico) ≤ umbral | decidir |
-| D6 | Formato de salida al banco | `Profile` + `PortfolioProposal` (contratos) + regla cuando juego y test discrepan | decidir |
-| D7 | Umbrales de éxito de validación (criterios en la sección 5) | por definir con datos | decidir |
-| D8 | Stack frontend | React/Vite o Streamlit | decidir |
-| D9 | Nombre del producto | BehaviorLab (provisional) | decidir |
-| D10 | Bono de bienvenida en el juego | Marco narrativo + inversión del bono en la cartera propuesta | decidir |
-| D11 | Inicio "Crea tu personaje" | Cuestionario declarativo camuflado (baseline de V2 y RF-10) | decidir |
-| D12 | Nivel de videojuego | Estética de juego sin motor, junto a D8 | decidir |
+| D1 | Variables a medir | λ (aversión a la pérdida), θ (caída a la que se vende), η (fracción del aumento de sueldo que se invierte) | cerrada |
+| D2 | Acciones por ronda | vender todo / mantener / aportar el 10% del sueldo | cerrada |
+| D3 | Rondas por partida | 12 a 16 (≈ 5 min) | cerrada |
+| D4 | Escenarios | Sintéticos calibrados con volatilidad y caídas del catálogo; sin nombre | cerrada |
+| D5 | Criterio de cartera | Maximizar el percentil 10 de riqueza final sujeto a P(venta en pánico) ≤ umbral | cerrada |
+| D6 | Formato de salida al banco | `Profile` + `PortfolioProposal` (contratos) + regla cuando juego y test discrepan | cerrada |
+| D7 | Umbrales de éxito de validación (criterios en la sección 5) | por definir con datos | cerrada |
+| D8 | Stack frontend | React/Vite o Streamlit | cerrada |
+| D9 | Nombre del producto | BehaviorLab | cerrada |
+| D10 | Bono de bienvenida en el juego | Marco narrativo + inversión del bono en la cartera propuesta | cerrada |
+| D11 | Inicio "Crea tu personaje" | Cuestionario declarativo camuflado (baseline de V2 y RF-10) | cerrada |
+| D12 | Nivel de videojuego | Estética de juego sin motor, junto a D8 | cerrada |
 
 ## 4. Arquitectura y contratos
-Módulos y flujo como en `CLAUDE.md`. Contratos mínimos (pydantic) que se congelan el domingo por la noche:
+Módulos y flujo como en `CLAUDE.md`. Contratos mínimos (pydantic) (congelados el 8-nov):
 - `Scenario`: semilla, serie de rentabilidades por ronda, metadatos de calibración.
 - `GameState` y `Decision`: ronda, patrimonio, sueldo, acción, tiempo de respuesta.
 - `Posterior`: rejilla de (λ, θ, η), pesos, resumen (media, intervalo creíble al 90%).
@@ -59,7 +59,7 @@ Módulos y flujo como en `CLAUDE.md`. Contratos mínimos (pydantic) que se conge
 API (FastAPI, solo orquesta): `POST /games`, `POST /games/{id}/decision`, `GET /games/{id}/profile`, `GET /games/{id}/proposal`.
 
 ## 5. Modelo y validación (resumen para el equipo de datos)
-**Elección:** probabilidad softmax sobre la utilidad de cada acción, con utilidad tipo teoría prospectiva simplificada y ruido τ. **Inferencia:** posterior discretizado en rejilla (numpy), sin MCMC: simple, explicable y rápido. **Pregunta adaptativa:** elegir la siguiente situación que maximiza la información mutua esperada entre la acción y los parámetros. **Cartera:** muestrear parámetros del posterior, simular N trayectorias por candidata aplicando esa política y comparar riqueza final y probabilidad de venta en pánico. Las trayectorias sintéticas pueden subestimar colas: valorar remuestreo de rentabilidades históricas del catálogo (decidir).
+**Elección:** probabilidad softmax sobre la utilidad de cada acción, con utilidad tipo teoría prospectiva simplificada y ruido τ. **Inferencia:** posterior discretizado en rejilla (numpy), sin MCMC: simple, explicable y rápido. **Pregunta adaptativa:** elegir la siguiente situación que maximiza la información mutua esperada entre la acción y los parámetros. **Cartera:** muestrear parámetros del posterior, simular N trayectorias por candidata aplicando esa política y comparar riqueza final y probabilidad de venta en pánico. Las trayectorias sintéticas pueden subestimar colas: valorar remuestreo de rentabilidades históricas del catálogo (trabajo futuro).
 
 Validaciones (informe en `reports/validation.md`):
 - **V1 Recuperación de parámetros:** jugadores simulados con parámetros conocidos. Criterio: error medio por debajo de un umbral y cobertura del intervalo al 90% cercana al 90% (umbrales en D7).

@@ -1,6 +1,6 @@
 # Roles y dueños
 
-Cada carpeta tiene un dueño: revisa sus PRs y decide en caso de duda. Rellenad nombre y GitHub.
+Cada carpeta tiene un dueño: revisa sus PRs y decide en caso de duda.
 
 | Rol | Persona | GitHub | Dueño de | Responsable de |
 |---|---|---|---|---|
@@ -11,7 +11,7 @@ Cada carpeta tiene un dueño: revisa sus PRs y decide en caso de duda. Rellenad 
 
 ## Reglas
 - Tocar fuera de tu carpeta → avisar al dueño antes.
-- `contracts/` se congela el domingo por la noche; después, cambios solo con PR y acuerdo de los cuatro.
+- `contracts/` se congeló el domingo 8-nov; después, cambios solo con PR y acuerdo de los cuatro.
 - Cada persona trabaja con su cuenta de Claude Code sobre su rama; `CLAUDE.md` es igual para todos.
 - Bloqueo de más de 30 min → decirlo en el chat.
 - Sincronización: 15 min al empezar y al acabar cada día.

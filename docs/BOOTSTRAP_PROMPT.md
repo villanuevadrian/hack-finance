@@ -1,3 +1,5 @@
+> **Registro del proceso.** Prompt con el que se creó el esqueleto del repo el 8-nov. Se conserva como documentación de cómo se trabajó con Claude Code.
+
 # Prompt de arranque (lo pega UNA persona en Claude Code, en una carpeta vacía)
 
 Antes: crea el repo en GitHub, clónalo, copia dentro `CLAUDE.md` y `docs/SPEC.md`, y abre Claude Code en esa carpeta. Usa modo plan.

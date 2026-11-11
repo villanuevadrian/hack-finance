@@ -1,3 +1,5 @@
+> **Registro del proceso.** Hoja de trabajo de la reunión inicial del 8-nov. Todas las dudas quedaron cerradas; las decisiones vigentes están en `docs/DECISIONS.md`.
+
 # Dudas para cerrar el domingo 8-nov por la noche
 
 Hoja de trabajo para la reunión de esta noche (30-45 min, los cuatro). Cada duda trae la **recomendación de Claude** (marcada así) para que discutamos algo concreto, no en blanco. **Nada de esto está decidido.** Lo que se acuerde se copia a `docs/DECISIONS.md` (fuente de verdad de las decisiones) y esta hoja se archiva.
