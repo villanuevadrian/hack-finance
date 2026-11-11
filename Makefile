@@ -3,13 +3,21 @@ PYTHON ?= python3.12
 VENV   := .venv
 BIN    := $(VENV)/bin
 
-.PHONY: setup test lint format run-api run-web validate clean
+LOCK   := requirements-lock.txt
 
-setup: ## Crea .venv e instala el proyecto con dependencias de desarrollo
+.PHONY: setup lock test lint format run-api run-web validate clean
+
+setup: ## Crea .venv e instala el proyecto con las versiones exactas de requirements-lock.txt
 	@command -v $(PYTHON) >/dev/null || { echo "Falta $(PYTHON). Instala Python 3.12 o usa: make setup PYTHON=/ruta/a/python3.12"; exit 1; }
 	$(PYTHON) -m venv $(VENV)
 	$(BIN)/python -m pip install --upgrade pip
-	$(BIN)/python -m pip install -e ".[dev]"
+	$(BIN)/python -m pip install -c $(LOCK) -e ".[dev]"
+
+lock: ## Reescribe requirements-lock.txt con lo instalado en .venv (tras cambiar dependencias y pasar make test)
+	@{ echo "# Versiones exactas probadas con make test. Se aplican como restricciones en make setup."; \
+	   echo "# Regenerar con: make lock"; \
+	   $(BIN)/python -m pip freeze --exclude-editable | grep -v '^behaviorlab'; } > $(LOCK)
+	@echo "$(LOCK) actualizado"
 
 test: ## Ejecuta todos los tests
 	$(BIN)/pytest

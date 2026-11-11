@@ -7,6 +7,7 @@
 /.github/                          @villanuevadrian
 /Makefile                          @villanuevadrian
 /pyproject.toml                    @villanuevadrian
+/requirements-lock.txt             @villanuevadrian
 /backend/behaviorlab/inference/    @amandehision16
 /backend/behaviorlab/validation/   @amandehision16
 /reports/                          @amandehision16
