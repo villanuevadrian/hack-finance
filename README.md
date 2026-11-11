@@ -30,11 +30,21 @@ Todo funciona sin configurar nada. Opcional, en un `.env` en la raíz (copiad `.
 |---|---|
 | `ANTHROPIC_API_KEY` | Vega, la ayudante, responde con Claude. Sin clave (o si falla la red) responde con preguntas frecuentes fijas. `GET /config` indica `"assistant_uses_claude"` |
 | `BEHAVIORLAB_DECISION_TIMEOUT_MS` | Tiempo por decisión (por defecto 30 000) |
-| `BEHAVIORLAB_DATA_DIR` | Carpeta donde guardar las partidas para que sobrevivan a un reinicio (por defecto, solo en memoria). Debe quedar fuera de git |
-| `VITE_ENABLE_VOICE` | Voz de Vega con los audios pregrabados de `frontend/public/audio/` (T2). Activada por defecto en `frontend/.env.development` y `.env.production`; con `false`, solo subtítulos. El navegador no reproduce sonido hasta el primer clic en la página |
+| `DATABASE_URL` | **Base de datos PostgreSQL** donde se guardan las partidas (tabla `behaviorlab_games`, se crea sola). Es lo que hay que usar en producción (Render, Neon, Supabase…). `GET /config` indica `"storage": "postgres"` |
+| `BEHAVIORLAB_DATA_DIR` | Alternativa sin base de datos: una carpeta con un JSON por partida (`"storage": "disk"`). Sin ninguna de las dos, las partidas viven solo en memoria y se pierden al reiniciar. Debe quedar fuera de git |
+| `ELEVENLABS_API_KEY` y `ELEVENLABS_VOICE_ID` | La voz de Vega desde el servidor (`POST /tts`, con caché en `data/cache/tts`): lee resultados, confianza del perfil y respuestas del chat con **la misma voz** que los audios pregrabados. La clave nunca llega al navegador |
+| `VITE_ENABLE_VOICE` | Voz de Vega: audios pregrabados de `frontend/public/audio/` y, para lo que cambia, la voz del servidor; siempre la misma voz (ver `frontend/README.md`). Activada por defecto en `frontend/.env.development` y `.env.production`; con `false`, solo subtítulos. El navegador no reproduce sonido hasta el primer clic en la página |
 | `VITE_API_URL` | Dirección de la API para el frontend (por defecto `http://localhost:8000`; `make run-web` la ajusta a `API_PORT`) |
 
 Claude **nunca** calcula cifras: todos los números salen de código determinista con tests.
+
+**Comprobar un despliegue real** (API, base de datos, Claude, ElevenLabs, misma voz, CORS, web y una partida completa):
+`cd frontend && npm run check:deploy -- <URL de la API> <URL de la web>`.
+
+**Perfil poco concluyente y accesibilidad:** el plan explica la confianza del perfil y qué falta para afinarlo; se
+puede continuar una partida a medias o repetirla, y pedir revisión humana (RGPD art. 22), visible en el portal de la
+entidad. Modos "más tiempo" (el doble, queda anotado en la partida) y "prefiero escuchar", barras de escucha con pausa
+y repetición, dictado para preguntar a Vega, navegación por teclado, foco visible y movimiento reducido.
 
 Puertos por defecto: API 8000 y web 5280. Si alguno está ocupado: `make run-api API_PORT=8010` y `make run-web WEB_PORT=5290 API_PORT=8010`.
 

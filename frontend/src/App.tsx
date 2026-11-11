@@ -4,7 +4,10 @@ import type { Action, GameState, Phase } from './api/types'
 import type { InvestorSheet } from './character'
 import { completedLevel, LEVEL_ORDER } from './levels'
 import { DECISION_TIMEOUT_MS } from './game'
-import { markFinished, rememberGame } from './localIndex'
+import { setHeadlineBank } from './headlines'
+import { loadPrefs, savePrefs, type Prefs } from './prefs'
+import type { GameMeta } from './api/client'
+import { loadCurrent, markFinished, rememberGame, saveCurrent } from './localIndex'
 import { BankPanel } from './screens/BankPanel'
 import { BankPortal } from './screens/BankPortal'
 import { Briefing } from './screens/Briefing'
@@ -15,6 +18,7 @@ import { Onboarding } from './screens/Onboarding'
 import { ResultsScreen, type Results } from './screens/Results'
 import { useVoice } from './voice/context'
 import { VoiceProvider } from './voice/voice'
+import { configureVoice, loadVoiceManifest } from './voice/engine'
 import { worldFor } from './worlds'
 import { Backdrop } from './components/Backdrop'
 import { APP_NAME } from './config'
@@ -48,11 +52,30 @@ function Shell() {
   const [bankView, setBankView] = useState<{ game: GameState; results: Results } | null>(null)
   const [busy, setBusy] = useState(false)
   const [timeoutMs, setTimeoutMs] = useState(DECISION_TIMEOUT_MS)
+  const [baseTimeoutMs, setBaseTimeoutMs] = useState(DECISION_TIMEOUT_MS)
+  const [prefs, setPrefs] = useState<Prefs>(loadPrefs)
+  const [resumable, setResumable] = useState<{ game: GameState; sheet: InvestorSheet } | null>(null)
+  useEffect(() => {
+    const cur = loadCurrent<InvestorSheet>()
+    if (!cur) return
+    api.game(cur.game_id)
+      .then((g) => { if (!g.finished) setResumable({ game: g, sheet: cur.sheet }) })
+      .catch(() => { /* the server no longer has it (restarted): nothing to resume */ })
+  }, [])
+  const [meta, setMeta] = useState<GameMeta | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   // The engine's time limit, so the clock on screen and the backend always agree.
   useEffect(() => {
-    api.config().then((c) => setTimeoutMs(c.decision_timeout_ms)).catch(() => { /* older server: default */ })
+    api.config()
+      .then((c) => {
+        setTimeoutMs(c.decision_timeout_ms)
+        setBaseTimeoutMs(c.decision_timeout_ms)
+        configureVoice({ serverTts: Boolean(c.tts_available), serverVoice: c.tts_voice_id ?? null })
+      })
+      .catch(() => { /* older server: defaults */ })
+    void loadVoiceManifest()
+    api.headlines().then((h) => setHeadlineBank(h.headlines)).catch(() => { /* older server: local templates */ })
   }, [])
 
   useEffect(() => {
@@ -79,18 +102,64 @@ function Shell() {
   const loadResults = (id: string) =>
     Promise.all([
       api.profile(id), api.proposal(id), api.posterior(id).catch(() => null), api.catalog().catch(() => null),
-      api.counterfactuals(id).catch(() => null),
-    ]).then(([profile, proposal, posterior, catalog, counterfactuals]) => ({ profile, proposal, posterior, catalog, counterfactuals }))
+      api.counterfactuals(id).catch(() => null), api.meta(id).catch(() => null),
+    ]).then(([profile, proposal, posterior, catalog, counterfactuals, meta]) => ({ profile, proposal, posterior, catalog, counterfactuals, meta }))
+
+  const updatePrefs = (p: Prefs) => {
+    setPrefs(p)
+    savePrefs(p)
+    configureVoice({ deviceFallback: p.deviceVoice })
+  }
+  useEffect(() => {
+    configureVoice({ deviceFallback: prefs.deviceVoice })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  /** New game; with previousGameId it continues an inconclusive profile (the entity sees both games). */
+  async function launch(s: InvestorSheet, previousGameId?: string) {
+    const g = await run(() => api.createGame(s.answers, { accessible: prefs.moreTime, previousGameId }))
+    if (!g) return
+    rememberGame(g.game_id)
+    saveCurrent(g.game_id, s)
+    // The time per decision of THIS game, from the server, so the clock and the engine agree.
+    const m = await api.meta(g.game_id).catch(() => null)
+    setMeta(m)
+    setTimeoutMs(m?.timeout_ms ?? baseTimeoutMs)
+    setGame(g)
+    setResults(null)
+    setDone(0)
+    setScreen('map')
+    window.scrollTo({ top: 0 })
+  }
+
+  /** Continue a game left half-way in this browser: the server kept every decision. */
+  async function resume() {
+    if (!resumable) return
+    const { game: g, sheet: s } = resumable
+    const m = await api.meta(g.game_id).catch(() => null)
+    setSheet(s)
+    setMeta(m)
+    setTimeoutMs(m?.timeout_ms ?? baseTimeoutMs)
+    setGame(g)
+    setResults(null)
+    setDone(g.phase ? LEVEL_ORDER.indexOf(g.phase) : 0)
+    setResumable(null)
+    setScreen('map')
+  }
 
   async function start(s: InvestorSheet) {
     setSheet(s)
-    const g = await run(() => api.createGame(s.answers))
-    if (g) {
-      rememberGame(g.game_id)
-      setGame(g)
-      setDone(0)
-      setScreen('map')
-    }
+    await launch(s)
+  }
+
+  async function replay() {
+    if (sheet && game) await launch(sheet, game.game_id)
+  }
+
+  async function askReview() {
+    if (!game) return
+    const m = await run(() => api.requestReview(game.game_id))
+    if (m) setMeta(m)
   }
 
   async function decide(action: Action | null, responseTimeMs: number, feeling?: string) {
@@ -142,6 +211,7 @@ function Shell() {
 
   return (
     <div className="app" data-screen={bank ? 'bank' : screen} data-phase={!bank && screen === 'game' && game?.phase ? game.phase : 'none'}>
+      <a className="skip-link" href="#main" onClick={(e) => { e.preventDefault(); document.querySelector('main')?.setAttribute('tabindex', '-1'); (document.querySelector('main') as HTMLElement | null)?.focus() }}>Saltar al contenido</a>
       <Backdrop />
       <div className="brand no-print">
         <span>{APP_NAME}</span>
@@ -166,15 +236,19 @@ function Shell() {
         )
       ) : (
         <>
-          {screen === 'intro' && <Intro onStart={() => setScreen('onboarding')} busy={busy} error={null} />}
+          {screen === 'intro' && (
+            <Intro onStart={() => setScreen('onboarding')} busy={busy} error={null} prefs={prefs} onPrefs={updatePrefs}
+              resume={resumable ? { round: resumable.game.round_index, total: resumable.game.n_rounds, onResume: resume } : null} />
+          )}
           {screen === 'onboarding' && <Onboarding onDone={start} />}
           {screen === 'map' && world && sheet && <MapScreen world={world} avatar={sheet.avatar} done={done} busy={busy} onContinue={continueFromMap} />}
           {screen === 'briefing' && world && <Briefing phase={briefingPhase} world={world} onStart={() => setScreen('game')} />}
           {screen === 'game' && game && sheet && world && (
-            <Game game={game} world={world} avatar={sheet.avatar} goal={sheet.answers.goal} timeoutMs={timeoutMs} busy={busy} error={error} onDecide={decide} />
+            <Game game={game} world={world} avatar={sheet.avatar} goal={sheet.answers.goal} listen={prefs.listen} timeoutMs={timeoutMs} busy={busy} error={error} onDecide={decide} />
           )}
           {screen === 'results' && sheet && world && results && (
-            <ResultsScreen sheet={sheet} world={world} results={results} onPanel={() => setScreen('panel')} onRestart={restart} />
+            <ResultsScreen sheet={sheet} world={world} results={results} gameId={game?.game_id ?? ''} meta={meta ?? results.meta} busy={busy}
+              onPanel={() => setScreen('panel')} onRestart={restart} onReplay={replay} onReview={askReview} />
           )}
           {screen === 'panel' && game && results && <BankPanel game={game} results={results} onBack={() => setScreen('results')} />}
         </>

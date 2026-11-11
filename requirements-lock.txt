@@ -1,5 +1,5 @@
-# Versiones exactas probadas con make test (116 passed) el 2026-11-10 en Python 3.12.
-# Se aplican como restricciones en make setup. Regenerar con: make lock
+# Versiones exactas probadas con make test. Se aplican como restricciones en make setup.
+# Regenerar con: make lock
 annotated-doc==0.0.5
 annotated-types==0.8.0
 anyio==4.16.0
@@ -16,6 +16,8 @@ numpy==2.5.4
 opentelemetry-api==1.45.2
 packaging==26.3
 pluggy==1.7.0
+psycopg==3.3.8
+psycopg-binary==3.3.8
 pydantic==2.14.3
 pydantic_core==2.50.4
 Pygments==2.21.0

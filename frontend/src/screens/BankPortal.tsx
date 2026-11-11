@@ -19,6 +19,10 @@ export function BankPortal({ onOpen, onExit }: { onOpen: (gameId: string) => voi
   const [source, setSource] = useState<Source>('api')
   const [missing, setMissing] = useState(0)
   const [error, setError] = useState<string | null>(null)
+  const [storage, setStorage] = useState<string | null>(null)
+  useEffect(() => {
+    api.config().then((c) => setStorage(c.storage ?? null)).catch(() => setStorage(null))
+  }, [])
 
   useEffect(() => {
     if (!entered) return
@@ -84,7 +88,11 @@ export function BankPortal({ onOpen, onExit }: { onOpen: (gameId: string) => voi
         <p className="kicker">{ENTITY_NAME}: portal de la entidad</p>
         <h1>Clientes evaluados</h1>
         <p className="muted small">
-          {source === 'api' ? 'Partidas guardadas en el servidor.' : 'El servidor aún no tiene la lista de partidas: se muestran las jugadas en este navegador.'}
+          {source === 'api'
+            ? storage === 'postgres' ? 'Partidas guardadas en la base de datos (PostgreSQL).'
+              : storage === 'disk' ? 'Partidas guardadas en el disco del servidor.'
+                : 'Atención: el servidor guarda las partidas solo en memoria y se pierden al reiniciarse (falta DATABASE_URL).'
+            : 'El servidor aún no tiene la lista de partidas: se muestran las jugadas en este navegador.'}
           {missing > 0 && ` ${missing} partidas ya no están en el servidor (se reinició).`} Sin datos identificativos.
         </p>
       </div>
@@ -97,6 +105,8 @@ export function BankPortal({ onOpen, onExit }: { onOpen: (gameId: string) => voi
             <div className="panel kpi"><span>Completadas</span><strong>{finished.length}</strong></div>
             <div className="panel kpi"><span>Nivel final medio</span><strong>{finished.length ? avg.toLocaleString('es-ES', { maximumFractionDigits: 1 }) : '—'}</strong></div>
             <div className="panel kpi"><span>Creen aguantar más de lo que muestran</span><strong>{finished.length ? `${over} de ${finished.length}` : '—'}</strong></div>
+            <div className="panel kpi"><span>Piden revisión humana</span><strong>{rows.filter((r) => r.review_requested_at).length}</strong></div>
+            <div className="panel kpi"><span>Perfiles poco concluyentes</span><strong>{finished.filter((r) => r.reliability === 'baja').length}</strong></div>
           </div>
           {Object.keys(byPortfolio).length > 0 && (
             <div className="panel bp-block">
@@ -110,7 +120,7 @@ export function BankPortal({ onOpen, onExit }: { onOpen: (gameId: string) => voi
           )}
           <div className="panel bp-block bp-table-wrap">
             <table className="bp-table">
-              <thead><tr><th>Fecha</th><th>Cliente</th><th>Mundo</th><th>Estado</th><th>Nivel final</th><th>Limita</th><th>Cartera</th><th>Declarado / revelado</th><th></th></tr></thead>
+              <thead><tr><th>Fecha</th><th>Cliente</th><th>Mundo</th><th>Estado</th><th>Nivel final</th><th>Limita</th><th>Cartera</th><th>Declarado / revelado</th><th>Confianza</th><th>Notas</th><th></th></tr></thead>
               <tbody>
                 {rows.map((r) => (
                   <tr key={r.game_id}>
@@ -122,10 +132,15 @@ export function BankPortal({ onOpen, onExit }: { onOpen: (gameId: string) => voi
                     <td>{r.limiting?.length ? r.limiting.map((l) => LEVEL_LABEL[l] ?? l).join(', ') : '—'}</td>
                     <td>{r.portfolio_name ?? '—'}</td>
                     <td>{r.finished ? `${r.stated_level} / ${r.revealed_level}` : '—'}</td>
+                    <td>{r.reliability ?? '—'}</td>
+                    <td>
+                      {[r.review_requested_at && '⚑ Pide revisión', r.accessible && 'Modo accesible', r.previous_game_id && `Repite (${r.previous_game_id.slice(0, 6)})`]
+                        .filter(Boolean).join(' · ') || '—'}
+                    </td>
                     <td>{r.finished && <button className="ghost small" onClick={() => onOpen(r.game_id)}>Ver panel</button>}</td>
                   </tr>
                 ))}
-                {rows.length === 0 && <tr><td colSpan={9} className="muted">Todavía no hay partidas.</td></tr>}
+                {rows.length === 0 && <tr><td colSpan={11} className="muted">Todavía no hay partidas.</td></tr>}
               </tbody>
             </table>
           </div>

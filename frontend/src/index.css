@@ -801,6 +801,16 @@ a.mode:hover { color: var(--ink); border-color: var(--muted); }
 .modal-backdrop { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 20px; background: rgb(5 3 16 / 0.7); backdrop-filter: blur(5px); animation: card-in 200ms ease-out; }
 .modal { width: min(620px, 100%); padding: 24px; display: grid; gap: 14px; border: 2px solid var(--gold); }
 .modal h2 { font-size: 1.6rem; }
+/* On a phone the dialog is taller than the screen: it scrolls itself and the page behind stays still. */
+.modal { max-height: calc(100vh - 40px); max-height: calc(100dvh - 40px); overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.modal-backdrop { overscroll-behavior: contain; touch-action: none; }
+.modal-backdrop .modal { touch-action: pan-y; }
+html:has(.modal-backdrop), body:has(.modal-backdrop) { overflow: hidden; }
+@media (max-width: 600px) {
+  .modal-backdrop { padding: 10px; }
+  .modal { max-height: calc(100vh - 20px); max-height: calc(100dvh - 20px); padding: 18px; gap: 12px; }
+  .modal h2 { font-size: 1.3rem; }
+}
 @media (max-width: 900px) {
   .hero { grid-template-columns: 1fr; min-height: 0; }
   .hero-art { max-width: 460px; justify-self: center; width: 100%; }
@@ -919,3 +929,56 @@ a.mode:hover { color: var(--ink); border-color: var(--muted); }
 .game-hud .hud-months .levelmap { min-width: 0; }
 .stage-legend { left: auto; right: 10px; transform: none; }
 @media (max-width: 900px) { .stage-legend { right: 8px; left: 8px; width: auto; max-width: none; } }
+
+.feeling-ok { color: var(--contribute); font-weight: 600; }
+.low-rel { border-left: 3px solid var(--sell); padding-left: 10px; color: var(--ink); }
+
+/* ===== Accessibility: visible focus for keyboard users ===== */
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 6px; }
+button:focus:not(:focus-visible) { outline: none; }
+.skip-link { position: absolute; left: -9999px; top: 8px; z-index: 100; padding: 8px 14px; border-radius: 10px; background: var(--gold); color: #1a1300; font-weight: 700; }
+.skip-link:focus { left: 8px; }
+
+/* ===== Listen bar (read aloud with play, pause and replay) ===== */
+.listen { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.listen button { font: inherit; font-size: 0.85rem; font-weight: 600; padding: 4px 10px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+.listen button:hover { border-color: var(--muted); }
+.listen button:disabled { opacity: 0.6; cursor: wait; }
+.listen-compact button { padding: 2px 8px; font-size: 0.8rem; }
+.listen-src { font-size: 0.75rem; color: var(--muted); }
+.help-a .listen { display: flex; margin-top: 4px; }
+.help-a .listen button { background: #fff; color: #4b2aa8; border-color: #c9b8f5; }
+.eb-life .listen { margin-top: 2px; }
+
+/* ===== Profile confidence and human review ===== */
+.confidence { padding: 18px 22px; display: grid; gap: 8px; border-width: 2px; }
+.confidence[data-level='alta'] { border-color: var(--contribute); }
+.confidence[data-level='media'] { border-color: var(--gold); }
+.confidence[data-level='baja'] { border-color: var(--sell); }
+.conf-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.conf-head h2 { font-size: 1.4rem; }
+.confidence h3 { font-size: 1rem; color: var(--muted); margin-top: 4px; }
+.confidence ul { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
+.conf-level { font-family: var(--display); font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.conf-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--gold); }
+.confidence[data-level='alta'] .conf-dot { background: var(--contribute); }
+.confidence[data-level='baja'] .conf-dot { background: var(--sell); }
+.conf-cta { display: grid; gap: 6px; justify-items: start; margin-top: 6px; }
+.review-card { padding: 18px 22px; display: grid; gap: 8px; }
+.review-card h2 { font-size: 1.25rem; }
+.review-ok { color: var(--contribute); font-weight: 600; }
+.a11y-opts { border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; display: grid; gap: 8px; margin: 0; }
+.a11y-opts legend { font-family: var(--display); font-weight: 700; padding: 0 6px; }
+
+/* ===== "Tu mundo" panel: the 2D chart and the 3D scene always fit inside it ===== */
+.game2 .stage-2d { position: absolute; inset: 40px 12px 50px; display: block; }
+.game2 .stage-2d .wealth-chart { width: 100%; height: 100%; }
+.game2 .stage-view { height: clamp(220px, 31vh, 380px); }
+
+.resume-card { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: space-between; padding: 16px 20px; border: 2px solid var(--gold); }
+
+.voice-notice { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 80; margin: 0; padding: 10px 16px; border-radius: 12px; background: var(--panel); border: 1px solid var(--sell); color: var(--ink); font-size: 0.9rem; box-shadow: 0 10px 30px rgb(0 0 0 / 0.4); }
+
+.help-basic { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 6px; font-size: 0.7rem; background: #ece6ff; color: #5b5680; border: 1px solid #c9b8f5; }
+.help-mic { border: 1.5px solid #c9b8f5; background: #fff; border-radius: 10px; padding: 4px 8px; cursor: pointer; }
+.help-mic[data-on='true'] { background: #ffd6dc; border-color: var(--sell); animation: breathe 1.5s ease-in-out infinite; }

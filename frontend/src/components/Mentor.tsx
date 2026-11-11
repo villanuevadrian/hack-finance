@@ -1,5 +1,6 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { api } from '../api/client'
+import { ListenBar } from './ListenBar'
 import { usePrefersReducedMotion } from '../hooks'
 import { useVoice } from '../voice/context'
 import { SpeakButton } from '../voice/voice'
@@ -9,7 +10,7 @@ import { SpeakButton } from '../voice/voice'
  * lessons, between levels, plan) and never comments on how the player decided. She is not shown during the
  * rounds of the game. The player can fold her away at any time.
  */
-export function Mentor({ text, voiceKey, screen = '' }: { text: string; voiceKey: string; screen?: string }) {
+export function Mentor({ text, voiceKey, screen = '', gameId }: { text: string; voiceKey: string; screen?: string; gameId?: string }) {
   const reduced = usePrefersReducedMotion()
   const voice = useVoice()
   // On small screens she starts folded (portrait with a dot) so she does not cover the content.
@@ -45,7 +46,7 @@ export function Mentor({ text, voiceKey, screen = '' }: { text: string; voiceKey
             <button className="mentor-fold" onClick={() => setOpen(false)} aria-label="Ocultar a Vega">–</button>
           </p>
           {chat ? (
-            <HelpChat screen={screen} />
+            <HelpChat screen={screen} gameId={gameId} />
           ) : (
             <p className="mentor-text" onClick={() => setShown(text.length)}>
               <span aria-hidden="true">{text.slice(0, shown)}{!done && <span className="caret">▍</span>}</span>
@@ -84,16 +85,56 @@ function MentorPortrait() {
 }
 
 const SUGGESTIONS = ['¿Qué es este juego?', '¿Por qué me preguntáis mis ingresos?', '¿Qué es un fondo indexado?', '¿Qué cartera me recomiendas?']
+const RESULT_SUGGESTIONS = ['¿Por qué me proponéis esta cartera?', '¿Qué significa que mi perfil sea poco concluyente?', '¿Qué limita mi nivel?']
+
+interface SpeechRecognitionLike {
+  lang: string
+  interimResults: boolean
+  onresult: ((e: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null
+  onend: (() => void) | null
+  onerror: (() => void) | null
+  start: () => void
+  stop: () => void
+}
+
+type Turn = { role: 'user' | 'assistant'; content: string; basic?: boolean }
 
 /**
- * Questions to Vega about how the game works. Answers come from the backend (Claude with guardrails, or a fixed
- * FAQ without network). Not available during the rounds: the Mentor is not shown there.
+ * Open conversation with Vega about how the game works and, on the results screen, about the player's own
+ * results. The server builds the context of the results from the game id (the browser sends no data), keeps
+ * the guardrails (no advice, no invented figures) and falls back to fixed answers without network.
+ * Not available during the rounds: the Mentor is not shown there.
  */
-function HelpChat({ screen }: { screen: string }) {
-  const voice = useVoice()
+function HelpChat({ screen, gameId }: { screen: string; gameId?: string }) {
   const [q, setQ] = useState('')
-  const [log, setLog] = useState<{ q: string; a: string }[]>([])
+  const [log, setLog] = useState<Turn[]>([])
   const [busy, setBusy] = useState(false)
+  const sugs = gameId ? RESULT_SUGGESTIONS : SUGGESTIONS
+
+  // Talk to Vega: dictation with the browser's speech recognition (Chrome, Edge, Safari). The text appears in
+  // the box so the player can check it before sending. Hidden where the browser does not support it.
+  const Recognition = typeof window !== 'undefined'
+    ? ((window as unknown as Record<string, unknown>).SpeechRecognition ?? (window as unknown as Record<string, unknown>).webkitSpeechRecognition) as (new () => SpeechRecognitionLike) | undefined
+    : undefined
+  const canDictate = Boolean(Recognition)
+  const [listening, setListening] = useState(false)
+  const rec = useRef<SpeechRecognitionLike | null>(null)
+  function dictate() {
+    if (!Recognition) return
+    if (listening) {
+      rec.current?.stop()
+      return
+    }
+    const r = new Recognition()
+    r.lang = 'es-ES'
+    r.interimResults = true
+    r.onresult = (e) => setQ(Array.from(e.results).map((x) => x[0].transcript).join(' '))
+    r.onend = () => setListening(false)
+    r.onerror = () => setListening(false)
+    rec.current = r
+    setListening(true)
+    r.start()
+  }
 
   async function ask(question: string, e?: FormEvent) {
     e?.preventDefault()
@@ -101,11 +142,16 @@ function HelpChat({ screen }: { screen: string }) {
     if (!text || busy) return
     setBusy(true)
     setQ('')
+    const history = log.slice(-10).map(({ role, content }) => ({ role, content }))
+    setLog((l) => [...l, { role: 'user', content: text }])
     try {
-      const r = await api.ask(text, screen)
-      setLog((l) => [...l, { q: text, a: r.answer }])
-    } catch {
-      setLog((l) => [...l, { q: text, a: 'Ahora no puedo responder: mi servidor no tiene todavía la ayuda activada (nucleo-backend.patch).' }])
+      const r = await api.ask(text, screen, history, gameId)
+      setLog((l) => [...l, { role: 'assistant', content: r.answer, basic: r.source !== 'claude' }])
+    } catch (err) {
+      const msg = err instanceof Error && err.message.includes('muchas preguntas')
+        ? err.message
+        : 'Ahora no puedo responder: no hay conexión con mi servidor. Inténtalo de nuevo en un momento.'
+      setLog((l) => [...l, { role: 'assistant', content: msg }])
     } finally {
       setBusy(false)
     }
@@ -114,27 +160,28 @@ function HelpChat({ screen }: { screen: string }) {
   return (
     <div className="help-chat">
       <div className="help-log" aria-live="polite">
-        {log.length === 0 && <p className="help-hint">Pregúntame cómo funciona el juego. No puedo decirte qué decidir.</p>}
+        {log.length === 0 && <p className="help-hint">Escríbeme lo que quieras sobre el juego{gameId ? ' o sobre tus resultados' : ''}. No puedo decirte qué decidir.</p>}
         {log.map((m, i) => (
-          <div key={i} className="help-pair">
-            <p className="help-q">{m.q}</p>
-            <p className="help-a">
-              {m.a}
-              {voice.available && (
-                <button className="speak help-speak" onClick={() => voice.speak(m.a)} disabled={!voice.on} aria-label="Escuchar la respuesta">🔊</button>
-              )}
-            </p>
-          </div>
+          <p key={i} className={m.role === 'user' ? 'help-q' : 'help-a'}>
+            {m.content}
+            {m.basic && <span className="help-basic" title="Respuesta preparada de antemano: ahora mismo no puedo usar la IA">Respuesta básica</span>}
+            {m.role === 'assistant' && <ListenBar text={m.content} label="Escuchar la respuesta" compact />}
+          </p>
         ))}
         {busy && <p className="help-a muted">Pensando…</p>}
       </div>
       {log.length === 0 && (
         <div className="help-sugs">
-          {SUGGESTIONS.map((s) => <button key={s} onClick={() => ask(s)}>{s}</button>)}
+          {sugs.map((s) => <button key={s} onClick={() => ask(s)}>{s}</button>)}
         </div>
       )}
       <form className="help-form" onSubmit={(e) => ask(q, e)}>
-        <input value={q} onChange={(e) => setQ(e.target.value)} maxLength={500} placeholder="Escribe tu pregunta" aria-label="Tu pregunta para Vega" />
+        <input value={q} onChange={(e) => setQ(e.target.value)} maxLength={500} placeholder={listening ? 'Te escucho…' : 'Escribe o dicta tu pregunta'} aria-label="Tu pregunta para Vega" />
+        {canDictate && (
+          <button type="button" className="help-mic" data-on={listening} onClick={dictate} aria-pressed={listening}
+            aria-label={listening ? 'Dejar de escuchar' : 'Dictar la pregunta con el micrófono'}
+            title="El dictado lo hace tu navegador; revisa el texto antes de enviarlo">🎤</button>
+        )}
         <button type="submit" disabled={busy || !q.trim()}>Enviar</button>
       </form>
     </div>

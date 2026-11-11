@@ -46,6 +46,15 @@ make setup-web && make run-web             # http://localhost:5280 (CORS de la A
 - **Vega**, la mentora (`src/components/Mentor.tsx`): habla solo fuera de las decisiones medidas; nunca comenta cómo
   decidió el jugador.
 
+## Voz de Vega: siempre la misma
+
+Toda frase hablada pasa por `src/voice/engine.ts`: el audio grabado (`public/audio/`) solo si se hizo con la misma
+voz que usa el servidor (`public/audio/manifest.json` frente a `GET /config`); si no, ElevenLabs desde el backend
+(`POST /tts`, misma voz y mismos ajustes en `backend/behaviorlab/text/tts.py` y `scripts/gen-voice.mjs`). La voz del
+dispositivo **solo** si el jugador marca esa opción de accesibilidad; si no hay voz, se avisa y el texto sigue en
+pantalla. Para registrar con qué voz se hicieron los audios ya existentes (sin gastar créditos):
+`ELEVENLABS_VOICE_ID=... node scripts/gen-voice.mjs --manifest-only`.
+
 ## Voz (ElevenLabs, T2)
 
 Todos los textos narrables están en `src/voice/narration.json`. Los audios se generan **una vez**, con tu clave,
@@ -93,9 +102,8 @@ Three.js con React Three Fiber, cargado bajo demanda. Un mundo por objetivo (O1)
 aspecto; las alturas dependen solo del dinero y la tormenta solo del movimiento del mercado. Botón "Vista 2D" siempre
 disponible y vista 2D automática sin WebGL.
 
-## Pendiente
+## Pendiente (conocido)
 
-- [ ] `TODO(Frontend)`: servir los titulares desde `backend/behaviorlab/text/` (Claude + plantillas + caché); ahora
-      son las plantillas deterministas de `src/headlines.ts`, sin cifras.
-- [ ] `TODO(Núcleo)`: el contrato no guarda la confirmación de las respuestas atípicas ni el avatar.
-- [ ] Voz con ElevenLabs (T2).
+- `TODO(Núcleo)`: el contrato no guarda la confirmación de las respuestas atípicas ni el avatar; hoy viven en el
+  frontend y en el informe impreso. Añadirlo exige cambiar `contracts/` con el acuerdo del equipo.
+- La voz de las respuestas del chat usa la voz del navegador (no se pueden pregenerar).

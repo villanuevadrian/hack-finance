@@ -39,3 +39,26 @@ export function markFinished(gameId: string): void {
 }
 
 export const finishedCount = () => localGames().filter((g) => g.finished).length
+
+/**
+ * The game in progress in this browser, so the player can finish the pending months after closing the tab.
+ * The sheet (closed ranges, alias and avatar) stays only on this device; the game itself is on the server.
+ */
+const CURRENT = 'behaviorlab.current'
+
+export function saveCurrent<T>(gameId: string, sheet: T): void {
+  try {
+    localStorage.setItem(CURRENT, JSON.stringify({ game_id: gameId, sheet }))
+  } catch {
+    /* storage unavailable */
+  }
+}
+
+export function loadCurrent<T>(): { game_id: string; sheet: T } | null {
+  try {
+    const raw = localStorage.getItem(CURRENT)
+    return raw ? (JSON.parse(raw) as { game_id: string; sheet: T }) : null
+  } catch {
+    return null
+  }
+}

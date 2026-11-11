@@ -1,15 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { makeUtterance } from './browser'
+import { deviceFallbackOn, vegaAudio } from './engine'
 import { VoiceCtx, useVoice } from './context'
 
 /**
- * Voice (RF-11, T2) behind VITE_ENABLE_VOICE. Hybrid:
- *  1. ElevenLabs files from public/audio/<key>.mp3 (generated once with scripts/gen-voice.mjs): best quality,
- *     no cost per game, works offline.
- *  2. If a file is missing, the browser's own Spanish voice reads the same text (free, more robotic, varies by
- *     device). It also reads Vega's chat answers, which cannot be pre-generated.
- * Captions are always on screen. Each line plays by itself only the first time it appears; the 🔊 button
- * replays it. Browsers block sound until the first click on the page: a line blocked that way plays on the
- * first click. The player can mute everything (remembered in this browser).
+ * Vega's voice (RF-11) behind VITE_ENABLE_VOICE. Every line goes through voice/engine.ts, so it is always the
+ * same ElevenLabs voice: the pre-recorded file when it matches the server's voice, otherwise the server's
+ * synthesis. The device's voice is used ONLY if the player chose it (accessibility option). Captions are always
+ * on screen. Each line plays by itself only the first time it appears; the 🔊 button replays it. Browsers block
+ * sound until the first click: a blocked line plays on the first click. The player can mute everything.
  */
 const ENABLED = import.meta.env.VITE_ENABLE_VOICE === 'true'
 const STORAGE_KEY = 'behaviorlab.voice'
@@ -23,26 +22,11 @@ function readPref(): boolean {
   }
 }
 
-/**
- * The most natural Spanish voice the device has: high-quality voices first (Google's in Chrome, the "enhanced"
- * or "premium" ones of macOS), then any voice from Spain, then any Spanish voice.
- */
-function bestSpanishVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | undefined {
-  const es = voices.filter((v) => v.lang.toLowerCase().startsWith('es'))
-  const score = (v: SpeechSynthesisVoice) =>
-    (/google|premium|enhanced|mejorada|natural|neural/i.test(v.name) ? 4 : 0) + (v.lang === 'es-ES' ? 2 : 0) + (v.localService ? 0 : 1)
-  return [...es].sort((a, b) => score(b) - score(a))[0]
-}
-
 function browserSpeak(text: string, onStart?: () => void, onBlocked?: () => void): void {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
   const synth = window.speechSynthesis
   synth.cancel()
-  const u = new SpeechSynthesisUtterance(text)
-  u.lang = 'es-ES'
-  u.rate = 1.03
-  const voice = bestSpanishVoice(synth.getVoices())
-  if (voice) u.voice = voice
+  const u = makeUtterance(text)
   u.onstart = () => onStart?.()
   u.onerror = (e) => {
     if (e.error === 'not-allowed') onBlocked?.()
@@ -53,8 +37,10 @@ function browserSpeak(text: string, onStart?: () => void, onBlocked?: () => void
 export function VoiceProvider({ children }: { children: ReactNode }) {
   const [on, setOn] = useState(() => ENABLED && readPref())
   const current = useRef<HTMLAudioElement | null>(null)
+  const playToken = useRef<object | null>(null)
 
   const stop = useCallback(() => {
+    playToken.current = null
     current.current?.pause()
     current.current = null
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) window.speechSynthesis.cancel()
@@ -62,7 +48,7 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
 
   // A line the browser did not let us play yet (no click on the page so far): it plays on the first click.
   const pending = useRef<{ key: string; text?: string } | null>(null)
-  const playRef = useRef<(key: string, text?: string) => void>(() => {})
+  const playRef = useRef<(key: string | undefined, text?: string) => void>(() => {})
 
   const block = useCallback((key: string, text?: string) => {
     pending.current = { key, text }
@@ -71,37 +57,46 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
       window.removeEventListener('keydown', resume)
       const p = pending.current
       pending.current = null
-      if (p) playRef.current(p.key, p.text)
+      if (p) playRef.current(p.key || undefined, p.text)
     }
     window.addEventListener('pointerdown', resume, { once: true })
     window.addEventListener('keydown', resume, { once: true })
   }, [])
 
-  const speak = useCallback((text: string) => {
-    if (!ENABLED || !on) return
-    stop()
-    browserSpeak(text)
-  }, [on, stop])
+  const [notice, setNotice] = useState<string | null>(null)
+  const unavailable = useCallback(() => {
+    setNotice('La voz de Vega no está disponible ahora mismo. Tienes el texto en pantalla.')
+    window.setTimeout(() => setNotice(null), 4000)
+  }, [])
 
   const play = useCallback(
-    (key: string, text?: string) => {
+    (key: string | undefined, text?: string) => {
       if (!ENABLED || !on) return
       stop()
-      const audio = new Audio(`${import.meta.env.BASE_URL}audio/${key}.mp3`)
-      current.current = audio
-      // Marked as heard only when it really starts, so a blocked or interrupted line is not lost.
-      audio.addEventListener('playing', () => heard.add(key))
-      // No file for this line: the browser's voice reads the same text instead.
-      audio.addEventListener('error', () => {
-        if (current.current === audio && text) browserSpeak(text, () => heard.add(key), () => block(key, text))
-      })
-      audio.play().catch((e: unknown) => {
-        // Autoplay blocked until the user interacts with the page: try again on the first click.
-        if (e instanceof DOMException && e.name === 'NotAllowedError') block(key, text)
-      })
+      const token = {}
+      playToken.current = token
+      void vegaAudio(key, text ?? '')
+        .then(({ url }) => {
+          if (playToken.current !== token) return // another line started meanwhile
+          const audio = new Audio(url)
+          current.current = audio
+          // Marked as heard only when it really starts, so a blocked or interrupted line is not lost.
+          if (key) audio.addEventListener('playing', () => heard.add(key))
+          audio.play().catch((e: unknown) => {
+            // Autoplay blocked until the user interacts with the page: try again on the first click.
+            if (e instanceof DOMException && e.name === 'NotAllowedError') block(key ?? '', text)
+          })
+        })
+        .catch(() => {
+          if (playToken.current !== token) return
+          if (deviceFallbackOn() && text) browserSpeak(text, () => key && heard.add(key), () => block(key ?? '', text))
+          else unavailable()
+        })
     },
-    [on, stop, block],
+    [on, stop, block, unavailable],
   )
+
+  const speak = useCallback((text: string) => play(undefined, text), [play])
   useEffect(() => {
     playRef.current = play
   }, [play])
@@ -127,7 +122,12 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const value = useMemo(() => ({ available: ENABLED, on, toggle, play, playOnce, speak, stop }), [on, toggle, play, playOnce, speak, stop])
-  return <VoiceCtx.Provider value={value}>{children}</VoiceCtx.Provider>
+  return (
+    <VoiceCtx.Provider value={value}>
+      {children}
+      {notice && <p className="voice-notice" role="status">{notice}</p>}
+    </VoiceCtx.Provider>
+  )
 }
 
 /** Small speaker button: replays a line whenever the player wants. Hidden when voice is disabled for the build. */

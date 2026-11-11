@@ -13,7 +13,7 @@ export function MapScreen({ world, avatar, done, busy, onContinue }: { world: Wo
   }, [])
   const key = done === 0 ? `world_${world.kind}` : `map_${done}`
   const text = N.mentor[key as keyof typeof N.mentor]
-  const title = done === 0 ? `Bienvenida a ${world.name}` : done === 3 ? '¡Mundo completado!' : '¡Zona completada!'
+  const title = done === 0 ? `Te damos la bienvenida a ${world.name}` : done === 3 ? '¡Mundo completado!' : '¡Zona completada!'
   return (
     <main className="mapscreen">
       <div className="title-block">
