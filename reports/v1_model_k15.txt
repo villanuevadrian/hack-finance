@@ -1,0 +1,23 @@
+﻿# estimator: model, players per generator: 200
+gen      param     k    bias    MAE  cov90  width  skill
+matched  lambda   15   0.076  0.592   0.94  2.260   0.07
+matched  theta    15   0.015  0.042   0.94  0.192   0.56
+matched  eta      15  -0.003  0.088   0.93  0.392   0.65
+noisy    lambda   15  -0.030  0.583   0.92  2.246   0.08
+noisy    theta    15  -0.002  0.045   0.92  0.202   0.53
+noisy    eta      15  -0.018  0.125   0.89  0.465   0.51
+sharp    lambda   15   0.147  0.624   0.90  2.265   0.02
+sharp    theta    15   0.023  0.039   0.95  0.186   0.59
+sharp    eta      15   0.003  0.070   0.96  0.351   0.73
+lapse    lambda   15   0.009  0.619   0.91  2.263   0.03
+lapse    theta    15   0.010  0.047   0.95  0.211   0.51
+lapse    eta      15  -0.003  0.115   0.92  0.476   0.55
+hard     lambda   15   0.148  0.650   0.88  2.265  -0.02
+hard     theta    15   0.024  0.041   0.96  0.198   0.57
+hard     eta      15   0.008  0.096   0.94  0.363   0.62
+mixed    lambda   15  -0.023  0.600   0.91  2.252   0.06
+mixed    theta    15   0.006  0.047   0.95  0.212   0.51
+mixed    eta      15  -0.011  0.121   0.91  0.487   0.52
+noisy3   lambda   15  -0.086  0.602   0.91  2.237   0.05
+noisy3   theta    15  -0.013  0.054   0.85  0.209   0.44
+noisy3   eta      15  -0.019  0.147   0.85  0.510   0.42
