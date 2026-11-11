@@ -1,1 +1,1 @@
-CI: `ci.yml` ejecuta `make setup`, `make lint` y `make test` en cada PR y en cada push a `main`.
+CI: `ci.yml` tiene dos trabajos en cada PR y en cada push a `main`: backend (`make setup`, `make lint`, `make test`) y frontend (`make setup-web`, `make test-web`: tests, lint y build).
